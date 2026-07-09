@@ -194,7 +194,7 @@ Authoring the layout by hand rather than generating it buys three things that ma
 
 - **No degenerate maps.** No orphaned rooms, no vault behind a single unwinnable corridor, no corridor that connects to nothing. Connectivity is a property of the drawing, checked once by a human at authoring time, not a property the generator has to be argued into every round.
 - **Readable buildings.** A hand-drawn floorplan has sightlines, chokepoints, and shortcuts that were *composed*. Both players learn the shape of a blueprint over a match and start playing against its geometry rather than re-scouting a stranger every round.
-- **Cheap validation.** Because the walls are fixed, the generator's output space is small and enumerable, so the automated checks (see [DEVELOPMENT.md](DEVELOPMENT.md), Phase 11) verify a role assignment rather than a graph.
+- **Cheap validation.** Because the walls are fixed, the generator's output space is small and enumerable, so the automated checks (see [DEVELOPMENT.md](DEVELOPMENT.md), Phase 12) verify a role assignment rather than a graph.
 - **A blueprint is a thing you can steal.** Because the layout is authored rather than conjured at runtime, it exists as a document in the fiction — which is exactly what the Infiltrator carries in (see The Blueprint, under Player One). A generated maze couldn't have been on file anywhere.
 
 What the Warden still can't memorize is where anything *is*.
