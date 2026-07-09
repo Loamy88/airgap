@@ -71,7 +71,7 @@ They are also, in most situations, **bad ideas.** That's deliberate, and it isn'
 
 - **Radio scanner** — an always-on earpiece on the guards' channel. It doesn't tell you *what* a nearby guard is reporting, only that they've keyed their radio: a burst of static, and roughly the direction it came from. You learn that you've been seen, and that the Warden is right now reading a sentence about you, a few seconds before anything happens. Whether that sentence is "uh, control, I might have something" or a clean ID, you never find out. It's the thinnest possible window into the Warden's information, and its whole job is turning *I think I got away with that* into *I definitely did not*.
 
-  It's also the kit's only unambiguously safe tool — which is what makes it the one that most often tells you the other two were a mistake.
+  It's also the kit's only unambiguously safe tool — which is what makes it the one that most often tells you the other two were a mistake. It receives only. The rare **radio spoofer** (see Found Items) is the same radio taught to transmit, and transmitting is anything but safe.
 
 Nothing here makes the Infiltrator better in a fight, because the Infiltrator is never in a fight. Two of the three actively make it *easier* to be caught if used carelessly — a test any future addition to this tier should have to pass.
 
@@ -109,6 +109,7 @@ Example pool (not exhaustive — meant to be large enough that no two rounds fee
 - **Map fragment** — a torn page of the facility's engineering copy. Permanently labels every room in **one wing** on your blueprint, and marks which of its doors are badge-gated. Common; you'll usually find one, and it usually covers a wing you weren't going to search anyway.
 - **Maintenance schematic** — the whole thing: the facility's own current, marked-up copy of the blueprint. Permanently labels **every room** — the three Data Vaults, the Power Room, the Surveillance/Ops Room — plus every door type and every sabotage fixture. Rare, and the single strongest item in the pool: it collapses the Infiltrator's central problem from *find the objective* to *reach it*. Deliberately no help at all with guards, cameras, or sensors, so knowing where the vault is only sharpens the question of how to get in.
 - **Signal sniffer** — permanently pins the nearest two Warden-placed sensors to your blueprint. Where the map items reveal architecture, this is the only one that reveals *deployment*.
+- **Radio spoofer** — one transmission on the guard channel, as Control. The rarest thing in the pool and the only tool in the game that lies to a person rather than to a machine. See Impersonating Control, under Warden.
 - **Body-drag glove** — lets a downed guard be dragged out of sightlines instead of left where they fell.
 - **Spoofed ID chip** — a longer-duration Ghost Pass, at the cost of a full slot instead of a cooldown.
 - **Backup tranq dart** — a single extra shot for the tranquilizer pistol, stacking with the base loadout.
@@ -136,7 +137,7 @@ Plays from a control room built around a bank of monitors. Wins through informat
 The Warden's UI is a wall of three separate monitors. Only one screen can hold full attention at a time; the rest run in the background and **ping** (a flash + audio cue) when something on them needs a look.
 
 - **Camera Bank** — a grid of feed thumbnails. Watching a feed live is the only way to positively identify the Infiltrator on camera; an unwatched feed still runs a background anomaly check (see False Alarms) but can't confirm a sighting.
-- **Guard Comms** — a live transcript feed, one line per guard, filling in word by word as each guard's report generates (see below). Pings the moment a guard keys their radio, before the message is even finished.
+- **Guard Comms** — the radio channel, in both directions. Guards' reports fill in word by word as they generate (see below); the Warden's own orders print here too, because an order *is* a radio transmission (see Guard Command). Pings the moment a guard keys their radio, before the message is even finished — but never pings for an outgoing order, since the Warden knows what they just sent. Usually.
 - **Facility Deployment** — the main map, and the only screen that's really several systems layered on one view:
   - Every guard's current position, ID, duty, and alertness — click a guard's icon to reassign them (see Guard Command) or to run a status check (see Guard Identity & Status Checks).
   - Every placed sensor as a dot on the map — flashes when it triggers, real or false, and is clickable for detail (type, last-triggered time).
@@ -145,13 +146,80 @@ The Warden's UI is a wall of three separate monitors. Only one screen can hold f
 
 If the Infiltrator cuts main power, the Camera Bank and a portion of the Facility Deployment's sensor layer go dark or degraded along with the facility's own lighting — the one event unmistakable enough to break through the Warden's usual screen-by-screen attention, precisely because it takes several systems away at once.
 
-### Guard Command: Duty & Alertness
-Every guard has a persistent ID (e.g. "G-04") shown on their Facility Deployment icon — the handle the Warden uses to address them, and the thing a badge gets tied to when it's stolen off one (see Guard Identity & Status Checks). Guards are not directly puppeted. Each guard runs on its own local behavior (patrol/react/report) driven by two things the Warden sets and can change at any time from the Facility Deployment screen:
+### Guard Command: The Radio Channel
+Every guard has a persistent ID (e.g. "G-04") shown on their Facility Deployment icon — the handle the Warden uses to address them, and the thing a badge gets tied to when it's stolen off one (see Guard Identity & Status Checks). Guards are not directly puppeted.
 
-- **Duty** — either **Guard a Point** (hold and watch one location) or **Patrol a Path** (walk one of a handful of predefined routes authored into that zone of the map). Reassigning duty takes a few seconds to take effect — guards finish their current beat before redeploying, so commands are a read on the *near* future, not an instant fix.
-- **Alertness** — a baseline the Warden sets per guard: **Relaxed**, **Standard**, or **Heightened**. This doesn't mean the guard has seen anything — it's a disposition. A Relaxed guard has a job and isn't looking for trouble: wide patrol swings, slow to notice, slow to report. A Heightened guard is actively watching: tighter sightlines, faster to notice, but more susceptible to false alarms. All guards start a round Relaxed, on an assigned patrol or post, "just doing a job" — turning that up is a deliberate, informed choice by the Warden, not the default state.
+**Every command the Warden gives is a radio transmission.** There is no telepathy and no direct control: clicking a guard's icon on the map and typing into Guard Comms are two entry points to the same channel, and every order the Warden issues prints on Guard Comms alongside the guards' own reports. The Comms screen is the log of that channel, not a one-way transcript. This matters more than it sounds like it should — see Impersonating Control, below.
 
-Alertness is the dial; the guard's *actual* moment-to-moment state still climbs its own ladder from what it perceives, same as before — Alertness just shifts how sensitive and how fast that ladder moves.
+Orders come in two families, and **an order is never offered unless the guard can actually carry it out.** The Warden picks from the building's authored guard posts and patrol routes (see Guard Posts & Patrol Paths, under Facility) rather than pointing at arbitrary floor, so there is no such thing as ordering a guard to walk into a wall.
+
+**Deployment orders** — always available, to any guard:
+
+| Order | What the guard does |
+|---|---|
+| **Guard this point** | Holds and watches one authored post |
+| **Patrol this route** | Walks one of the predefined routes authored into that area |
+| **Set alertness** | Relaxed / Standard / Heightened |
+
+**Alertness** is a disposition, not a claim that the guard has seen anything. A Relaxed guard has a job and isn't looking for trouble: wide patrol swings, slow to notice, slow to report. A Heightened guard is actively watching: tighter sightlines, faster to notice, more susceptible to false alarms. All guards start a round Relaxed, "just doing a job" — turning that up is a deliberate, informed choice. Alertness is the dial; the guard's *actual* moment-to-moment state still climbs its own ladder from what it perceives.
+
+Deployment orders take a few seconds to land — guards finish their current beat before redeploying, so they're a read on the *near* future, not an instant fix.
+
+**Response orders** — available only while a guard's channel is open, meaning during their report or for a few seconds after it ends:
+
+| Order | Offered when | What the guard does |
+|---|---|---|
+| **Investigate that** | their memory holds a located event | Breaks off, searches that spot, returns to duty on a timer |
+| **Hold position** | they're Suspicious or Searching | Stays put and keeps scanning — won't leave to search |
+| **Disregard** | they're Suspicious or Searching | Drops a rung, dismisses the event, resumes duty |
+| **Say again** | they reported in the last few seconds | Re-reports from their *current* perception |
+| **Who's near you?** | any time | Names the nearest guard and whether they can see them |
+
+Two of these are sharper than they look. **Say again** is not a replay: the guard's memory has aged, so the second report can come back vaguer than the first, and you've spent the time. And **who's near you?** is a second route to discovering a takedown — if the named guard is down and in line of sight, the asking guard *sees the body* and escalates on the spot. It's a question that can detonate.
+
+Response orders land immediately; the guard has already stopped and is already looking at something. **Alarmed guards accept no orders at all** — they're chasing, and the Warden doesn't get to micromanage a capture.
+
+Every order the Warden gives is fed into that guard's next report, so a guard who was told to hold position reports differently from one told to go look — they acknowledge, they comply, or they push back.
+
+### Order Plausibility
+Guards are not obedient machines. Before carrying out an order, a guard checks it against what they themselves know, and **queries it on the radio instead of obeying** if it fails. The check is a fixed list of conditions, not a judgment call — the same conditions, every time, for every order, regardless of who sent it:
+
+1. **It contradicts what they're looking at.** You cannot tell a guard to disregard or hold when they have the Infiltrator in live sight. Stale memory can be dismissed; a person standing in front of them cannot.
+2. **It pulls them off a high-security post.** A guard assigned to the Data Vault cluster, the Power Room, or the Ops Room does not abandon it on a radio order alone. Those posts are the ones that matter, so those are the ones a voice can't move.
+3. **It answers a report they never made.** Response orders only make sense on an open channel. Control replying to a sighting nobody radioed in is nonsense, and the guard says so.
+4. **It contradicts an order they just received.** Two orders to the same guard inside a few seconds, and the second gets a "Control, you just told me—".
+
+A queried order prints on Guard Comms as the guard's own line and is *not* carried out. This applies to the Warden too: give your own guard a bad order and they'll question it, in front of everyone. That symmetry is the point — it teaches the rules, and it means a queried order tells you nothing about who sent it.
+
+A guard's personality (see Guard Perception & Radio Reports) changes how the pushback *sounds* — a nervous guard demands confirmation, a bored one grumbles — but never whether it happens. The check is deterministic. No dice.
+
+### Impersonating Control
+Because every order is a radio transmission and nothing about the channel proves who's talking, the Infiltrator can send one.
+
+The **radio spoofer** is a found item (see Found Items, under Player One), not a loadout pick — a rare thing you build a plan around on the fly. It sends **one order, from the same tables above, to one guard**, labelled CONTROL. The guard obeys, because as far as they can tell, they were ordered to. It prints on Guard Comms formatted exactly like the Warden's own orders, with no ping, because the Warden's own orders don't ping either.
+
+This is the game's whole thesis in one item. Every other screen the Warden has can be tricked, jammed, looped, or blacked out — Guard Comms was the last one that only ever told the truth.
+
+**What it costs.** The spoofer is powerful and it is terrifying to use:
+
+- **One charge.** There is no second attempt.
+- **You must know the guard.** The order needs a guard ID, and IDs come from seeing a guard or watching one report. Spoofing is the reward for scouting, the way the pry-bar takedown is the reward for positioning.
+- **You must be close.** The spoofer transmits at scanner range, so the guard you're deceiving is one you could nearly touch.
+- **Four seconds, stationary, no cancel** — and while your channel is open you are **deaf**. The scanner and the spoofer are the same radio. For four seconds you cannot hear a single key-up, at the exact moment you have most invited one.
+- **It expires.** A spoofed order holds for about thirty seconds, then the guard reverts to their standing orders — because Control's last *authenticated* deployment is on record and a voice on the radio isn't. You are buying a window, not rewriting the Warden's board.
+- **It can simply be refused.** The plausibility check above doesn't care who transmitted. Ask a guard to walk off the vault and they'll query it, loudly, and the charge is gone.
+
+Notice what that last one means: the spoofer is weakest exactly where it would be strongest. The order you most want to send is the one most likely to be questioned.
+
+**How the Warden catches it.** Three residues, in ascending order of reliability:
+
+1. **The forged order itself**, sitting on Guard Comms — a line they don't remember sending.
+2. **The guard's acknowledgment.** "Roger, holding." Even a Warden who missed the order sees a guard agreeing to something nobody said.
+3. **The transmitter ping.** The facility's radio network doesn't care whether a *guard* was fooled: it logs where every transmission physically originated, and a transmission claiming to be Control that came from inside the building is impossible. A delayed, imprecise origin ping — a zone, not a marker, exactly like a Network Intrusion alert — lands on the Facility Deployment map.
+
+The third one is the design's answer to "how do you make deception fair." **The guard can be fooled; the network cannot.** Detection is guaranteed at the system level, and the only question is whether the Warden was *looking* — which is the question this entire game is about. There is no authentication code, no challenge-response, no checksum. The Infiltrator is not beating a lock. They are betting that somebody, somewhere, isn't paying attention.
+
+And since the spoofer only reaches a guard at scanner range, that ping lands roughly on top of the Infiltrator. You bought deception with your location.
 
 ### Guard Identity & Status Checks
 A takedown is not, by itself, information. A guard the Infiltrator drops just stops — sitting wherever they fell, no different on the map from a guard standing still for a moment.
@@ -177,6 +245,7 @@ Each guard tracks, in real time:
 - **Sight** — whether the Infiltrator is visible, and how much of them: nothing, a silhouette in the dark, a partial glimpse, or a clear ID, based on light level, distance, angle, and obstruction.
 - **Sound** — footsteps, sprinting, pry-bar swings, thrown gadgets, or other noise events, tagged with rough type and direction. Whether a guard actually *notices* one is a roll, not a radius (see below).
 - **Memory** — a short rolling log of what that specific guard has personally seen or heard in the last minute or so. A guard who caught a flicker of movement two zones back and now hears footsteps nearby reports differently than one hearing footsteps cold.
+- **Personality** — a fixed disposition per guard, for the whole match. One is nervous and over-reports, so half their sightings are nothing. One is bored and under-reports, so when *they* key up, it's real. This changes only how a guard talks and how readily they volunteer a report — never what they perceive, never whether they obey an order. The Warden learns over three rounds which guards to trust, and the Infiltrator, listening on the scanner, learns which ones are twitchy. Same information, opposite uses.
 
 ### Hearing Is a Roll, Not a Radius
 A noise event doesn't have an edge you can stand just outside of. Every sound rolls against every guard who could plausibly hear it, and the chance they notice falls off with distance from the source, scales with the noise's loudness, and shifts with their Alertness — a Heightened guard is listening, a Relaxed one has a job to do.
