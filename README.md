@@ -27,7 +27,7 @@ Player One is a contracted infiltrator hired to pull LUMEN's weights out through
 
 ## Match Structure
 
-- **Map generation:** immediately before setup, the round's facility is procedurally assembled from the room-module library (see Facility) — a new layout, new Data Vault candidate positions, new item spawns, every round. Neither player has seen this exact arrangement before, and the Warden can't rely on memorizing where the objective lives.
+- **Map generation:** immediately before setup, the round rolls a facility from one of a handful of hand-authored **blueprints** — the walls, corridors, and doorways are fixed and known, but *what each room is* is decided fresh (see Facility). Same floorplan, different Data Vault positions, different item spawns, different guard posts. Neither player knows this arrangement, and the Warden can't rely on memorizing where the objective lives — but nobody has to learn a brand-new building either.
 - **Setup phase (60 seconds):** Warden spends a fixed budget placing cameras/sensors/traps on the generated layout and assigns each guard's starting duty and alertness. Simultaneously, the Infiltrator gets a one-time exterior scout — building blueprints and entrance points, but no interior camera feeds.
 - **Round (8–10 minutes):** live play, ending on a win condition or the clock (Warden wins on timeout — a stalled Infiltrator has failed the job).
 - **Match = best of 3 rounds, with roles swapped each round.** Because the map regenerates every round anyway, no round replays an identical layout.
@@ -234,8 +234,14 @@ Match winner is the higher total across 3 rounds (roles swapped each round), so 
 
 - **Engine:** Unity 2D (URP, for the Light2D-driven night lighting), which also supports the top-down/dashboard-style UI for the Warden in the same project.
 - **Controls:** Infiltrator on gamepad or keyboard+mouse; Warden on keyboard+mouse only (screen-switching and guard-clicking want precise pointing, not a controller).
-- **Local-first:** same-machine or LAN 1v1 for the prototype; matchmaking/netcode is a post-prototype concern, not a v1 requirement.
+- **Two devices, always.** No split-screen and no shared-machine mode — each player runs their own client on their own device and connects over a network. This isn't just a UX choice: the Warden's whole premise is *not* being in the room, and a shared screen or shared machine would leak information (a glance at the other half of the screen, a shoulder-surfed dashboard) that the design depends on staying hidden. Networking is therefore a day-one requirement, not a post-prototype add-on — see Networking, below, and [DEVELOPMENT.md](DEVELOPMENT.md) for where it lands in the build order.
 - **Guard dialogue model:** a small local language model, not a cloud API call — needs to run fast enough for real-time word-by-word streaming and can't depend on an internet connection mid-match. See [DEVELOPMENT.md](DEVELOPMENT.md) for the staged approach (rule-based first, real model second).
+
+### Networking
+- **Dev-time (short term):** direct LAN connect between two devices on the same network — no third-party service needed, cheapest way to get the plumbing working and validate the netcode early.
+- **Recommended (real use):** Unity Netcode for GameObjects + Unity Relay & Lobby. Relay handles NAT traversal so neither player needs to port-forward, and Lobby gives a simple join-code flow (one player hosts and shares a code, the other enters it) — no dedicated server to run, and Unity's free tier comfortably covers a 2-player indie game.
+- **Host selection:** under a host-authoritative model, whoever hosts has a small latency advantage. Since the Infiltrator's side is the more timing-sensitive one (movement, guard vision, the LLM report stream), default to the Infiltrator hosting, or let players choose at match start.
+- **Later, if it matters:** move from host-authoritative to a small dedicated server (a headless Unity build, self-hosted or on a cheap VPS) once the game is competitive enough that host advantage or a tampered client reading local "ground truth" (e.g. real guard positions before a sighting confirms them) becomes worth closing off. Not a prototype concern.
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for the build plan, in order.
 

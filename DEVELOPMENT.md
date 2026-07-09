@@ -35,8 +35,14 @@ This project is meant to be built mostly by Claude Code rather than by hand, so 
 
 ### Part C: Input & Control Definitions
 - [ ] **Input Manager config:** define gamepad/keyboard axes for Infiltrator (move, sprint, aim) and Warden (screen-switch, click). Store in InputManager.asset.
-- [ ] **Split-screen/split-monitor decision:** document the chosen approach in a settings comment (stored as JSON or prefab reference for later).
 - [ ] **Control schema file:** create a document (markdown or JSON) listing all input bindings for future reference.
+
+### Part D: Basic Networking Scaffold
+Two devices, always — no split-screen, no shared-machine mode (see Networking, in README.md, for why). This means a minimal network layer has to exist from Phase 0, not get retrofitted after the fact.
+- [ ] **Install Netcode for GameObjects (NGO)** package.
+- [ ] **One universal build, role chosen at connect time** — rather than shipping separate Infiltrator/Warden executables, a single build presents a host-or-join screen and a role pick, simplifying distribution to one artifact.
+- [ ] **LAN direct-connect for dev-time:** basic `NetworkManager` setup using IP-based direct connect — no Relay/Lobby yet, just enough to prove two processes can talk. This is the foundation Phase 15 upgrades to Relay/Lobby later.
+- [ ] **Smoke test:** two separate processes (two Editor instances on one dev machine for early testing, or two actual devices on the same LAN) connect, each resolves into the correct role, and a trivial synced value (a ping RPC) round-trips. Every later phase builds on this connection existing.
 
 ## Phase 1 — Grey-box Movement Prototype
 Single test room, no AI yet — just prove movement and stealth *feel* before adding anything reactive to it. Claude Code generates all scripts; you create one test scene in the editor and hit Play to validate feel.
@@ -162,10 +168,13 @@ A second NPC class, deliberately weaker and lower-fidelity than guards, whose wh
 - [ ] Ambient night/facility soundscape.
 - [ ] UI ping/alert sounds distinct per screen (Camera Bank vs. Guard Comms vs. Facility Deployment should each have a recognizable cue, including a distinct one for door/badge pings).
 
-## Phase 15 — Networking
-- [ ] LAN 1v1 session (same-machine split-screen/split-monitor may already cover the prototype — only build this if remote play is actually needed next).
+## Phase 15 — Networking Hardening
+By this point every phase has been built and tested against Phase 0 Part D's bare LAN scaffold. This phase upgrades that scaffold into something two players can actually use from different locations — it's not standing up networking for the first time.
+- [ ] **Unity Relay + Lobby integration:** replace direct IP-connect with a join-code flow (host creates a lobby, shares the code, the other player enters it) — removes the port-forwarding requirement of the Phase 0 LAN scaffold.
+- [ ] **Host selection:** default to the Infiltrator's client hosting (the more latency-sensitive side — movement, guard vision timing, the LLM report stream), with an option for players to choose at match start instead.
 - [ ] State sync for guard/Technician positions (where visible), alertness, consciousness state, and sensor/door events.
 - [ ] Sync strategy for streaming guard-report text specifically (this is the one system with an ongoing, interruptible stream rather than discrete state — needs its own thought, not just generic state replication).
+- [ ] **Stretch:** migrate from host-authoritative to a small dedicated server (headless Unity build, self-hosted or a cheap VPS) if host advantage or client-side trust (e.g. a modified Warden client reading local guard state it shouldn't have) becomes worth closing off. Not required for the prototype.
 
 ## Phase 16 — Playtesting & Balancing
 - [ ] Tune alert-ladder thresholds and Alertness modifiers.
