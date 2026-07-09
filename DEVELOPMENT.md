@@ -13,8 +13,9 @@ If Unity is not yet installed: `choco install unity-hub` (Windows), or download 
 
 ## Working with Claude Code
 This project is meant to be built mostly by Claude Code rather than by hand, so the plan is shaped around that:
-- **Data-driven over hardcoded.** Room modules, patrol paths, item pool entries, and gadget stats should live as data (JSON/YAML), not baked into scenes or magic numbers — an agent can generate, extend, and tune data files far more reliably than it can edit a scene.
-- **Automated validation over manual playtesting for generation.** Anything procedural (Phase 11 especially) runs through headless-mode C# validators — map connectivity, reachability, exfil availability — so Claude Code can verify its own output without human editor intervention.
+- **Data-driven over hardcoded.** Blueprints, room anchors, patrol loops, item pool entries, and gadget stats should live as data (JSON/YAML), not baked into scenes or magic numbers — an agent can generate, extend, and tune data files far more reliably than it can edit a scene.
+- **Hand-authored layout, generated contents.** Facility floorplans are drawn by hand and shipped as data; only room roles, item/guard/sensor anchor selection, and door typing are rolled per round (Phase 11). This is the single biggest complexity saving in the project — it keeps the generator's output space small, enumerable, and cheap to validate.
+- **Automated validation over manual playtesting for generation.** Blueprints are validated once at authoring time (connectivity, closed patrol loops); each round's role assignment is validated per-seed in CI. Both run as headless-mode C# validators, so Claude Code can verify its own output without human editor intervention.
 - **Each checklist item below is meant to be handed over as its own scoped prompt** — small enough to implement and verify in one pass, with a clear "done" condition (compiles, passes CI validation, playable in isolation).
 - **Hybrid workflow:** Claude Code writes all scripts and data; you open the editor only to (a) wire scenes together from pre-made prefabs, (b) hit Play to test feel, or (c) adjust balance numbers. No hand-crafting level layouts or scripting from the editor.
 - **Flag-for-human items:** feel and balance tuning (Phase 16), and any "does this read as fun/tense" judgment call. Everything else — state machines, data schemas, UI wiring, procedural algorithms, validation — is fair game to drive end-to-end with Claude Code via command line.
@@ -130,19 +131,36 @@ Swap the rule-based generator from Phase 6 for the real system, behind the same 
 - [ ] Exfil point detection and win-condition wiring for both objective types.
 - [ ] Network intrusion alert integration (hacking risk, and the Surveillance/Ops Room hack from Phase 11, both tie back into Phase 8's sensor layer).
 
-## Phase 11 — Procedural Facility Generation & Room Library
-This is the phase that turns "Halcyon Site 7" from one hand-built map into a room-module kit assembled fresh each round — the anti-turtling backbone of the whole design, so it earns its own phase rather than being folded into level art.
-- [ ] Author the room-module library as data/prefabs: entrance, office/admin, Data Vault candidate, Power Room, Surveillance/Ops Room, filler (storage/GPU/breakroom), item-spawn variants — each with its own connection points, guard-post markers, and light-source markers.
-- [ ] Graph-based layout generator: place and connect modules into a full facility per round (a room-graph approach, in the spirit of rogue-like generators — start simple, e.g. a connected tree/loop over a fixed module budget, before adding constraints).
-- [ ] Automated validation pass (per the Working with Claude Code note above): every generated map must have every Data Vault candidate reachable, at least one path from every entrance to the vault cluster, at least the intended number of exfil points, and no single vault trivially isolable behind one chokepoint — reject and regenerate if not.
-- [ ] Data Vault candidate selection: place N candidates per map, all real and functionally identical (feeds Phase 10's multi-vault win check).
-- [ ] Guard posts and patrol paths generated/assigned per placed module (data feeding Phase 3), rather than hand-authored per fixed zone.
-- [ ] Power Room state machine: blackout burst (all lighting/cameras/sensors down briefly) → degraded-power ("awaiting repair") state (dimmer lighting, partial sensor/camera outage). The state machine only tracks broken/fixed here; the actual repair dispatch is Phase 12.
-- [ ] Sabotage fixture placement: sensor relay boxes (disable a sensor cluster) and zone breaker panels (disable one room's lighting) as interactable, sabotage-then-flag-for-repair points, same pattern as the Power Room.
-- [ ] **Door placement and typing:** most doors placed as either unlocked (no interaction needed) or lockpick-only (Phase 9's lockpick/bypass kit, no badge involved); a smaller subset — the Data Vault cluster, Power Room, Surveillance/Ops Room — placed as badge-gated, wired to Phase 4's door-log and plausibility-check backend.
-- [ ] Surveillance/Ops Room: hackable terminal exposing the same guard position/duty/alertness data the Warden's Facility Deployment screen reads, gated behind a slower hack and a guaranteed Network Intrusion ping (feeds Phase 8).
-- [ ] Item-pool spawn system: a large authored pool of possible found items, weighted-random subset (~4–6) selected and placed into item-spawn modules per round (feeds Phase 9's pickup/swap interaction).
-- [ ] Light-source placement per module (feeding Phase 2) and exfil-point selection from placed entrance modules.
+## Phase 11 — Blueprints, Room Roles & Round Generation
+This is the phase that turns "Halcyon Site 7" from one hand-built map into a set of hand-built maps whose *contents* reshuffle every round — the anti-turtling backbone of the whole design, so it earns its own phase rather than being folded into level art.
+
+**The layout is not generated.** Floorplans are authored by hand and shipped as data; generation only decides what each room *is*, what's in it, and who's guarding it. This is a deliberate trade: it gives up "no two maps ever share a shape" in exchange for eliminating the entire class of layout-generation bugs (orphaned rooms, unreachable vaults, degenerate corridors) that would otherwise dominate this phase, and it makes the automated validation a small, enumerable check instead of a graph proof. Everything downstream — patrol pathing, sensor coverage, sightlines — becomes tractable because the walls hold still.
+
+### Part A: Authoring (data, no runtime code)
+- [ ] **Blueprint schema:** a JSON floorplan format — rooms, corridors, doorways, vent/crawlspace runs, exterior entrance positions. Every room is a **slot** with a stable ID and an `eligibleRoles` list.
+- [ ] **Author 3–4 blueprints** as data + tilemap prefabs, each a distinct building shape (long spine, central ring, two-wing split). Start with **one** blueprint and only add more once the role/anchor system below is proven against it.
+- [ ] **Anchor schema per room:** named, fixed points for `itemAnchor`, `guardPost` (position + facing), `lightSource`, `sensorMount`, `sabotageFixtureMount`. Nothing in the game is ever placed at a runtime-computed position.
+- [ ] **Patrol loop authoring:** each blueprint carries a set of complete, closed waypoint loops. The generator picks which loops are live; it never draws a route.
+- [ ] **Room dressing library:** per role (vault / power / ops / office / filler-storage / filler-GPU / filler-breakroom / filler-archive), a prefab + its own light and item anchors, so the same slot doesn't look identical two rounds running.
+- [ ] **Blueprint authoring validator** (`-batchmode`): run once per blueprint at author time, not per round — every room reachable, every entrance reaches every vault-eligible slot, every patrol loop closed, every doorway connects exactly two rooms. A blueprint that fails is a level-design bug, caught before it ships.
+
+### Part B: Round generation (the only runtime randomness)
+- [ ] **Role assignment pass:** given a blueprint and a seed, assign exactly one role per slot under a fixed recipe — from 5 vault-eligible slots choose 3 (all real, functionally identical; feeds Phase 10's multi-vault win check); from 2–3 power-eligible choose 1; from 2–3 ops-eligible choose 1; open a subset of the 4–6 authored entrances; everything else falls back to filler with a rolled dressing.
+- [ ] **Vault-spread constraint:** reject and reroll a role assignment whose 3 vaults are all in one wing or all mutually adjacent — the only real constraint in the whole generator, and it's a check on a set of ≤5 slot IDs, not a pathfind.
+- [ ] **Door typing pass:** roll each authored doorway as unlocked / lockpick-only (Phase 9's kit) / badge-gated, constrained so the slots that won Vault, Power, and Ops roles always sit behind a badge reader. Wire to Phase 4's door-log and plausibility-check backend.
+- [ ] **Item placement pass:** a large authored pool of found items; select a weighted-random subset (~4–6) and assign each to an `itemAnchor`, under a spread constraint (never all in one wing, never all on the shortest entrance→vault path). Feeds Phase 9's pickup/swap interaction.
+- [ ] **Guard deployment pass:** choose which `guardPost` anchors are manned and which authored patrol loops are live, weighted toward the slots that won Vault/Power/Ops — deployment should be a legible tell about where the objective is. Feeds Phase 3's duty data and Phase 4's plausibility check.
+- [ ] **Sabotage fixture placement:** bind sensor relay boxes (disable a sensor cluster) and zone breaker panels (disable one room's lighting) to `sabotageFixtureMount` anchors in the rooms whose systems they control — interactable, sabotage-then-flag-for-repair, same pattern as the Power Room.
+- [ ] **Light + exfil resolution:** activate each placed dressing's `lightSource` anchors (feeding Phase 2); select which of the round's open entrances also serve as exfil points.
+- [ ] **Sensor mount exposure:** hand the Warden's setup UI (Phase 13) the blueprint's `sensorMount` list as the legal placement set — the Warden picks from the same anchors the generator does.
+
+### Part C: Per-round validation
+- [ ] **Round validator** (`-batchmode`, runs on every generated round in CI over N seeds): 3 vaults assigned, all reachable, spread constraint satisfied, ≥2 exfil points, exactly 1 Power Room and 1 Ops Room, 4–6 items placed and spread, every badge-gated door's room role is one of Vault/Power/Ops, no manned guard post orphaned from a live patrol loop. Because the blueprint is pre-validated, this pass is assertions over a role table — it should run thousands of seeds in seconds and is the natural CI regression gate.
+- [ ] **Seed reproducibility:** a round is fully described by `(blueprintId, seed)`. Log it, and support replaying it, so any generation bug is reproducible from two values in a bug report.
+
+### Part D: Room mechanics
+- [ ] **Power Room state machine:** blackout burst (all lighting/cameras/sensors down briefly) → degraded-power ("awaiting repair") state (dimmer lighting, partial sensor/camera outage). The state machine only tracks broken/fixed here; the actual repair dispatch is Phase 12.
+- [ ] **Surveillance/Ops Room:** hackable terminal exposing the same guard position/duty/alertness data the Warden's Facility Deployment screen reads, gated behind a slower hack and a guaranteed Network Intrusion ping (feeds Phase 8).
 
 ## Phase 12 — Technicians & Repair
 A second NPC class, deliberately weaker and lower-fidelity than guards, whose whole job is clearing the "broken" flags Phase 11's sabotage fixtures and Phase 9's camera jammer set.
@@ -157,10 +175,10 @@ A second NPC class, deliberately weaker and lower-fidelity than guards, whose wh
 - [ ] Badge-door interaction: Technicians open badge-locked doors on their route; the Infiltrator can tailgate through behind one, or use a Technician's predictable destination to plan an ambush (ties into Phase 9's ID-card slot and Phase 4's badge system).
 
 ## Phase 13 — Match Flow, Scoring, Best-of-3
-- [ ] Setup-phase timer and budget-spend UI (Warden) + exterior-scout view (Infiltrator), running against a freshly generated map (Phase 11).
+- [ ] Setup-phase timer and budget-spend UI (Warden), constrained to the round's `sensorMount` anchor set (Phase 11), + exterior-scout view (Infiltrator) showing the blueprint's shape and which entrances opened.
 - [ ] Round timer and timeout-as-Warden-win handling.
 - [ ] Scoring table implementation (clean win / partial / early catch / timeout) and match total across 3 rounds.
-- [ ] Role swap between rounds, with a full facility regeneration (Phase 11) each round rather than a reused layout.
+- [ ] Role swap between rounds, with a fresh `(blueprintId, seed)` roll each round. Whether the blueprint itself changes between rounds of a match, or holds while only the contents reshuffle, is a **balance question for Phase 16** — holding it makes a match a deepening read of one building; rerolling it keeps both players scouting.
 
 ## Phase 14 — Audio Pass
 - [ ] Text-to-speech (or pre-recorded phoneme-driven) voice for guard reports, synced to the streaming text reveal from Phase 7.
@@ -198,6 +216,6 @@ This means Claude Code can iterate on logic/data/scripts independently, and you 
 
 ---
 
-**Sequencing note:** Phases 1–3 are the first real bet — a fun core loop with a single dumb guard and no dialogue at all, on one hand-built test room. Phase 4 (Guard Identity & Badge Security) is backend-only and can be built right alongside Phase 3, since it just extends the guard data model — it doesn't need UI until Phase 5 exists to expose the click-to-check interaction. Don't invest in Phase 7 (the language model) until Phase 6's rule-based version has proven the *streaming + interruption* mechanic is worth building for real. Phase 11 (procedural generation) is the second real bet and can be prototyped early against the Phase 1–3 test room with a tiny 2–3-module library, well before Phase 10's full multi-vault objective logic or the full room kit exist — validating "is a freshly shuffled layout actually fun to learn on the fly" is worth doing cheaply before building out the whole library. Phase 12 (Technicians) is a smaller, self-contained system that can slot in any time after Phase 9 and Phase 11 exist to give it gadgets and fixtures to react to. Everything else is additive breadth, not core-loop risk.
+**Sequencing note:** Phases 1–3 are the first real bet — a fun core loop with a single dumb guard and no dialogue at all, on one hand-built test room. Phase 4 (Guard Identity & Badge Security) is backend-only and can be built right alongside Phase 3, since it just extends the guard data model — it doesn't need UI until Phase 5 exists to expose the click-to-check interaction. Don't invest in Phase 7 (the language model) until Phase 6's rule-based version has proven the *streaming + interruption* mechanic is worth building for real. Phase 11 (blueprints and round generation) is the second real bet, and it's now a much cheaper one — the risky half (generating a layout) is gone, replaced by hand-authored floorplans. It can be prototyped early against the Phase 1–3 test room by drawing **one** blueprint with a handful of role-eligible slots, well before Phase 10's full multi-vault objective logic or the full dressing library exist — validating "does reshuffling what's in a familiar building actually create fresh decisions" is worth doing cheaply, on one blueprint, before drawing three more. Phase 12 (Technicians) is a smaller, self-contained system that can slot in any time after Phase 9 and Phase 11 exist to give it gadgets and fixtures to react to. Everything else is additive breadth, not core-loop risk.
 
 **With Unity locally installed and CLI available, Claude Code can drive Phases 0–4 almost end-to-end (up to the point where you hit Play and feel-test). Phases 5+ will need you to open the editor more often as UI and full-scene integration become necessary, but the data, logic, and procedural systems stay driven by Claude Code.**

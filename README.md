@@ -30,7 +30,7 @@ Player One is a contracted infiltrator hired to pull LUMEN's weights out through
 - **Map generation:** immediately before setup, the round rolls a facility from one of a handful of hand-authored **blueprints** — the walls, corridors, and doorways are fixed and known, but *what each room is* is decided fresh (see Facility). Same floorplan, different Data Vault positions, different item spawns, different guard posts. Neither player knows this arrangement, and the Warden can't rely on memorizing where the objective lives — but nobody has to learn a brand-new building either.
 - **Setup phase (60 seconds):** Warden spends a fixed budget placing cameras/sensors/traps on the generated layout and assigns each guard's starting duty and alertness. Simultaneously, the Infiltrator gets a one-time exterior scout — building blueprints and entrance points, but no interior camera feeds.
 - **Round (8–10 minutes):** live play, ending on a win condition or the clock (Warden wins on timeout — a stalled Infiltrator has failed the job).
-- **Match = best of 3 rounds, with roles swapped each round.** Because the map regenerates every round anyway, no round replays an identical layout.
+- **Match = best of 3 rounds, with roles swapped each round.** Room roles, item spawns, guard posts, and door types are rolled fresh every round, so no round replays an identical facility even if it reuses the same blueprint.
 
 ## Win / Loss Conditions
 
@@ -66,7 +66,7 @@ Separate from the 3-gadget loadout, the Infiltrator has one dedicated ID-card sl
 Unlike the Disguise gadget's generic fake, a looted badge is real and tied to a specific person's ID — good for whatever that person could open, right up until a Badge Flag catches up with it (see Guard Identity & Status Checks, under Warden). See Doors & Badge Access, under Facility, for how and when that happens.
 
 ### Found Items
-Beyond the 3 gadgets chosen at setup, a much larger item pool exists — only a handful of them (roughly 4–6) actually spawn in a given round, placed in item spawn modules around the generated map (see Facility). The Infiltrator doesn't know which ones until they're found, so scouting off the direct route to the objective is a real, live temptation, not just flavor. Carrying capacity stays fixed at 3 slots — picking up a found item means dropping a current gadget in its place, right there on the floor, so every pickup is a genuine trade, not a free stack.
+Beyond the 3 gadgets chosen at setup, a much larger item pool exists — only a handful of them (roughly 4–6) actually spawn in a given round, placed on **item anchors** authored into the rooms themselves (see Facility). The Infiltrator doesn't know which ones until they're found, so scouting off the direct route to the objective is a real, live temptation, not just flavor. Carrying capacity stays fixed at 3 slots — picking up a found item means dropping a current gadget in its place, right there on the floor, so every pickup is a genuine trade, not a free stack.
 
 Example pool (not exhaustive — meant to be large enough that no two rounds feel the same):
 - **Grapple line** — fast one-way traversal to a normally slow or high route.
@@ -171,16 +171,41 @@ No screen can be trusted blindly — part of the Warden's skill is learning to w
 
 ## The Facility
 
-**Halcyon Site 7** — a converted industrial building, procedurally assembled from a library of authored room modules at the start of every round. Same building "kit," different arrangement each time, specifically so a Warden can't just memorize where the objective lives and stack every camera and guard on top of it.
+**Halcyon Site 7** — a converted industrial building. The floorplan is not procedurally generated. It's drawn by hand, a handful of times, and one of those drawings is picked each round; what gets *shuffled* is everything inside it.
 
-### Room Library
-- **Entrance modules** — several possible exterior entry points exist (loading dock, maintenance hatch, roof access, service tunnel); the generator picks a subset each round, so entrances aren't fully predictable either.
-- **Office/Admin modules** — open-plan and corridor rooms forming the connective tissue between entrances and the vault cluster. Carry the vents and crawlspaces that make up the Infiltrator's shortcut layer.
-- **Data Vault candidates** — a small number (2–3) are placed on every generated map, and all of them are real: LUMEN can be extracted from any one of them, so a completed extraction at a single vault ends the round in the Infiltrator's favor. This is the single biggest lever against turtling — a fixed setup-phase budget can't fully fortify every vault the way it could one known Data Core, so the Warden has to genuinely split defensive commitment across all of them instead of walling off one room and calling it solved.
-- **Power Room** — houses the facility's main breaker. See Power & Blackouts.
-- **Surveillance/Ops Room** — houses a terminal mirroring the Warden's Facility Deployment screen: guard positions, duty, and alertness. Hacking it is slower than a normal terminal and immediately raises a Network Intrusion alert, so the Infiltrator is trading a loud, timed exposure for a temporary read of the same information the Warden gets for free.
-- **Filler modules** — storage rooms, GPU racks, breakrooms, archive stacks: no unique mechanic, just more square footage, more sightline breaks, and more places to wait out a patrol. These exist purely to dilute guard/camera density and give the Infiltrator somewhere to be that isn't inherently suspicious.
-- **Item spawn modules** — a subset of filler and office rooms roll a chance to contain a found item (see Found Items, under Player One).
+### Blueprints
+A **blueprint** is a complete, hand-authored floorplan: every wall, corridor, doorway, vent run, and stairwell, fixed and final. There are a small number of them (target: 3–4 for the prototype, more later), each a different shape of building — a long spine with ribs, a ring around a central core, a two-wing split.
+
+Authoring the layout by hand rather than generating it buys three things that matter more than novelty:
+
+- **No degenerate maps.** No orphaned rooms, no vault behind a single unwinnable corridor, no corridor that connects to nothing. Connectivity is a property of the drawing, checked once by a human at authoring time, not a property the generator has to be argued into every round.
+- **Readable buildings.** A hand-drawn floorplan has sightlines, chokepoints, and shortcuts that were *composed*. Both players learn the shape of a blueprint over a match and start playing against its geometry rather than re-scouting a stranger every round.
+- **Cheap validation.** Because the walls are fixed, the generator's output space is small and enumerable, so the automated checks (see [DEVELOPMENT.md](DEVELOPMENT.md), Phase 11) verify a role assignment rather than a graph.
+
+What the Warden still can't memorize is where anything *is*.
+
+### Room Roles
+Each room in a blueprint is a **slot**. A slot declares which **roles** it's eligible to take, and generation assigns exactly one role per slot under a fixed recipe. A room that is a Data Vault this round is a GPU rack hall the next, in the same four walls.
+
+- **Data Vault** — 5 slots per blueprint are vault-eligible; 3 are chosen each round, and **all three are real**. LUMEN can be extracted from any one of them, so a completed extraction at a single vault ends the round in the Infiltrator's favor. The 2 slots that lost the roll become filler, and look like it. This is the single biggest lever against turtling: a fixed setup-phase budget can't fortify three rooms the way it could one known Data Core, and the Warden can't even be sure which five slots were in the running unless they've learned the blueprint.
+- **Power Room** — 2–3 eligible slots, 1 chosen. Houses the facility's main breaker. See Power & Blackouts.
+- **Surveillance/Ops Room** — 2–3 eligible slots, 1 chosen. Houses a terminal mirroring the Warden's Facility Deployment screen: guard positions, duty, and alertness. Hacking it is slower than a normal terminal and immediately raises a Network Intrusion alert, so the Infiltrator is trading a loud, timed exposure for a temporary read of the same information the Warden gets for free.
+- **Entrance** — every blueprint authors 4–6 exterior entry points (loading dock, maintenance hatch, roof access, service tunnel); a subset opens each round, and which ones is rolled. A sealed entrance is visibly sealed, so the exterior scout is real information.
+- **Office / Admin** — open-plan and corridor rooms forming the connective tissue between entrances and the vault cluster. Carry most of the vents and crawlspaces. Rarely role-swapped; they're the blueprint's skeleton.
+- **Filler** — storage rooms, GPU racks, breakrooms, archive stacks: no unique mechanic, just square footage, sightline breaks, and places to wait out a patrol. Every slot that doesn't win a special role falls back to filler, drawn from a set of filler dressings so the same slot doesn't look identical two rounds running.
+
+Because roles are assigned to slots rather than rooms being stitched together, the vault cluster isn't necessarily a cluster — the three vaults might be adjacent, or spread to three corners. That spread is itself part of what the Warden reads during setup.
+
+### Anchors
+Below room roles, the same principle again: **nothing is placed at a runtime-computed position.** Every room layout authors a fixed set of named anchor points, and generation chooses *which* of them to fill.
+
+- **Item anchors** — a storage closet authors five: on the top shelf, behind the crates, on the floor by the door, in the open locker, under the workbench. Across the whole map, ~40 anchors exist and 4–6 are filled (see Found Items, under Player One), with a spread constraint so they never all land in one wing or all on the direct entrance→vault path.
+- **Guard post anchors** — every room authors the spots a guard could plausibly stand and what they'd be watching. Post assignment picks from these.
+- **Patrol waypoints** — authored per blueprint as a set of complete, closed loops. Generation picks which loops are live and which guard walks which; it never draws a route freehand.
+- **Light anchors** — security lamps, monitor glow, overnight office lighting, exterior floodlights, authored per room dressing so shadow routes and light-pool hazards stay composed rather than emergent.
+- **Sensor mounts** — the legal positions the Warden can drop a camera, motion sensor, plate, mic, heat scanner, or trap during setup. The Warden picks from the same anchor set the generator uses, which is why a blueprint's coverage geometry is learnable.
+- **Sabotage fixture anchors** — sensor relay boxes and zone breaker panels sit on authored mounts inside the rooms whose systems they control.
+- **Door types** — doorways are fixed by the blueprint; whether a given one is unlocked, lockpick-only, or badge-gated is rolled, constrained so that the rooms that ended up as Vault / Power / Ops always land behind badge readers. See Doors & Badge Access.
 
 ### Power & Blackouts
 Cutting power at the Power Room is a single-use, facility-wide swing rather than a targeted tool:
@@ -193,12 +218,12 @@ Beyond cutting main power, the Infiltrator has a handful of ways to break someth
 - **Main power** (Power Room) — see Power & Blackouts.
 - **Camera jammer** — a plant-and-leave device, distinct from the quick camera looper, that kills a camera's feed indefinitely until a Technician physically removes it.
 - **Sensor relay sabotage** — disables a whole cluster of motion sensors/tripwires on one relay box until repaired.
-- **Zone breaker panel** — kills the lighting in a single room module until reset, a smaller, quieter cousin of a full power cut.
+- **Zone breaker panel** — kills the lighting in a single room until reset, a smaller, quieter cousin of a full power cut.
 
 Every one of these sits on the Warden's board as a standing problem until it's resolved — a Warden who's already spent their Technicians chasing sabotage elsewhere is, for a while, just short a camera, a light, or a working sensor cluster, on top of whatever the Infiltrator does next.
 
 ### Doors & Badge Access
-Most interior doors are either unlocked or simply locked — beatable with the Lockpick/bypass kit, no badge involved. Badge readers are reserved for a smaller set of higher-security doors (the Data Vault cluster, the Power Room, the Surveillance/Ops Room), so a stolen badge is a shortcut on a few real chokepoints, not a universal key.
+Doorways are fixed by the blueprint; their *type* is rolled. Most interior doors come up either unlocked or simply locked — beatable with the Lockpick/bypass kit, no badge involved. Badge readers are constrained to a smaller set of higher-security doors: whichever slots won the Data Vault, Power Room, and Surveillance/Ops roles this round always sit behind one. So a stolen badge is a shortcut on a few real chokepoints, not a universal key — and a badge reader appearing on a door that was unlocked last round is itself a hint about what's now behind it.
 
 - **Every badge-gated door is on the Facility Deployment map**, showing open/closed state and, if it was opened on a badge, exactly which badge ID opened it — guard or Technician (see The Screens, under Warden).
 - **Plausibility check.** The system knows a guard's current duty/post and a Technician's last dispatch destination. A badge used on a door nowhere near its owner's expected location raises a passive suspicion ping — softer than a hard Badge Flag, but still a tell, and it fires whether or not that badge has been flagged yet.
@@ -207,13 +232,13 @@ Most interior doors are either unlocked or simply locked — beatable with the L
 - **Technician cards cut both ways** — see No wake-up, no Badge Flag, under Technicians.
 
 ### Guard Posts & Patrol Paths
-Each generated map still authors a handful of fixed guard posts and a few patrol routes per area cluster, drawn from the room modules' own connection points — level-design content baked into each module, not something drawn freehand mid-round, so patrol logic stays sane however the modules get shuffled together, and doubles as the data the plausibility check (see Doors & Badge Access) compares badge use against.
+Both come from the blueprint's authored anchors, never from runtime pathing. Each round, generation picks which posts are manned and which of the authored patrol loops are live, weighted toward whichever slots won the Vault / Power / Ops roles — so the guard deployment is a *tell* about where the objective is, and the Infiltrator reading it early is a real skill. A guard's assigned post or loop is also the data the plausibility check (see Doors & Badge Access) compares badge use against.
 
 ### Exfil Points
-A handful of the placed entrance modules double as exfil points each round, generally with different exposure levels (a fast, camera-heavy route vs. a slow, quiet one) — which entrances double as exfil is itself part of what's randomized, so scouting matters even for a returning player.
+A subset of the round's open entrances double as exfil points, generally with different exposure levels (a fast, camera-heavy route vs. a slow, quiet one). Which entrances open, and which of those also exfil, is rolled per round — so scouting matters even on a blueprint you've played a dozen times.
 
 ### Lighting
-Every room module carries its own authored light sources (security lamps, monitor glow, overnight office lighting, exterior floodlights) against a dark baseline, so shadow routes and light-pool hazards stay readable and consistent within a room even though the overall map layout isn't.
+Every room dressing carries its own authored light sources (security lamps, monitor glow, overnight office lighting, exterior floodlights) against a dark baseline. Because the walls never move, a blueprint's light pools and shadow routes are stable enough to learn — but a room that was a dim archive last round can be a floodlit vault this one, so the *lighting* of a given room is rolled with its role, not fixed to its walls.
 
 ### Facility Alert Level
 Separate from individual guard alertness, this climbs Green → Yellow → Orange → Red across the whole round as evidence accumulates — a dropped guard, a tripped sensor, a badge anomaly. Higher tiers add roaming reserve guards and shorten the Warden's lockdown cooldown, so a sloppy early game has consequences that compound rather than resetting cleanly.
@@ -249,5 +274,5 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for the build plan, in order.
 
 - Meta-progression (unlockable gadgets/sensor types/found-item pool entries) — deliberately excluded from v1, which keeps loadouts symmetric/fixed so balance is easy to read.
 - Ranked ladder / matchmaking.
-- Additional room-module libraries — a whole second "kit" (different building type/theme) rather than just a bigger Halcyon Site 7 pool.
+- Additional blueprints, and eventually a whole second building (different type/theme, its own blueprint set and room dressings) rather than just more Halcyon Site 7 floorplans.
 - Cosmetic-only unlocks (guard uniforms, drone skins, control-room UI themes).
