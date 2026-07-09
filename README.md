@@ -28,7 +28,7 @@ Player One is a contracted infiltrator hired to pull LUMEN's weights out through
 ## Match Structure
 
 - **Map generation:** immediately before setup, the round rolls a facility from one of a handful of hand-authored **blueprints** — the walls, corridors, and doorways are fixed and known, but *what each room is* is decided fresh (see Facility). Same floorplan, different Data Vault positions, different item spawns, different guard posts. Neither player knows this arrangement, and the Warden can't rely on memorizing where the objective lives — but nobody has to learn a brand-new building either.
-- **Setup phase (60 seconds):** Warden spends a fixed budget placing cameras/sensors/traps on the generated layout and assigns each guard's starting duty and alertness. Simultaneously, the Infiltrator gets a one-time exterior scout — building blueprints and entrance points, but no interior camera feeds.
+- **Setup phase (60 seconds):** Warden spends a fixed budget placing cameras/sensors/traps on the round's sensor mounts and assigns each guard's starting duty and alertness. Simultaneously, the Infiltrator studies a **stolen blueprint** of the building — the full room and corridor layout, and nothing about what's in it (see The Blueprint, under Player One).
 - **Round (8–10 minutes):** live play, ending on a win condition or the clock (Warden wins on timeout — a stalled Infiltrator has failed the job).
 - **Match = best of 3 rounds, with roles swapped each round.** Room roles, item spawns, guard posts, and door types are rolled fresh every round, so no round replays an identical facility even if it reuses the same blueprint.
 
@@ -41,6 +41,18 @@ Player One is a contracted infiltrator hired to pull LUMEN's weights out through
 ## Player One — The Infiltrator
 
 Plays in the facility directly. Wins through patience and misdirection, not force.
+
+### The Blueprint
+The Infiltrator starts the round holding a stolen architectural blueprint of Halcyon Site 7 — available during the setup phase and on a toggle for the whole round. It shows the building's bones and nothing else:
+
+- **Shown:** every room and corridor, their true shape and connections; every doorway; the vent and crawlspace network; which exterior entrances exist and which are sealed tonight; the Infiltrator's own position on it.
+- **Not shown:** what any room *is*. No labels beyond blank outlines — the Data Vaults, the Power Room, and the Surveillance/Ops Room are three rooms among sixteen, and the blueprint can't tell you which. Nor can it show door types, guard posts or patrol routes, camera and sensor placements, item locations, or anything the Warden did during setup.
+
+This is precisely the split the blueprint system creates (see Facility): the *walls* are architecture and were on file somewhere to be stolen; *what's behind them* is tonight's operational deployment, and no architect ever drew that. Knowing the shape of the building without knowing its contents is the Infiltrator's whole starting position — you can plan a route, but not a target.
+
+The blueprint fills in as you play. Rooms you've entered keep their contents marked; doors you've tried show their type; sensors you've spotted pin to it. Reading the building against the blueprint is the core scouting act — a corridor with a badge reader on it and two guards standing around is telling you something the Warden would rather you didn't know yet.
+
+It can also be filled in by *finding a better copy of itself*. Several entries in the item pool are maps — a **Map fragment** labels one wing, and the rare **Maintenance schematic** labels the entire building, vaults included (see Found Items). Nothing in the facility was ever going to hand you the Warden's sensor placements or guard orders, but the building's own engineering drawings are lying around in it, and they know exactly what every room is. That's the item-pool chase in one line: the thing most worth finding is the answer to *where is the thing worth finding*.
 
 ### Movement & Stance
 - Crouch / walk / sprint, each with a visible noise-radius indicator — sprinting is loud and pings sound-based sensors.
@@ -73,7 +85,9 @@ Example pool (not exhaustive — meant to be large enough that no two rounds fee
 - **Smoke canister** — a few seconds of blocked line of sight in a small area, rather than the single-target EMP.
 - **Adrenaline shot** — a short, one-time sprint-speed boost without the usual noise penalty.
 - **Spare badge** — a second, weaker disguise charge for when the main one is already spent.
-- **Map fragment** — permanently reveals the location of one Warden-placed sensor for the rest of the round.
+- **Map fragment** — a torn page of the facility's engineering copy. Permanently labels every room in **one wing** on your blueprint, and marks which of its doors are badge-gated. Common; you'll usually find one, and it usually covers a wing you weren't going to search anyway.
+- **Maintenance schematic** — the whole thing: the facility's own current, marked-up copy of the blueprint. Permanently labels **every room** — the three Data Vaults, the Power Room, the Surveillance/Ops Room — plus every door type and every sabotage fixture. Rare, and the single strongest item in the pool: it collapses the Infiltrator's central problem from *find the objective* to *reach it*. Deliberately no help at all with guards, cameras, or sensors, so knowing where the vault is only sharpens the question of how to get in.
+- **Signal sniffer** — permanently pins the nearest two Warden-placed sensors to your blueprint. Where the map items reveal architecture, this is the only one that reveals *deployment*.
 - **Body-drag glove** — lets a downed guard be dragged out of sightlines instead of left where they fell.
 - **Spoofed ID chip** — a longer-duration Ghost Pass, at the cost of a full slot instead of a cooldown.
 - **Backup tranq dart** — a single extra shot for the tranquilizer pistol, stacking with the base loadout.
@@ -181,6 +195,7 @@ Authoring the layout by hand rather than generating it buys three things that ma
 - **No degenerate maps.** No orphaned rooms, no vault behind a single unwinnable corridor, no corridor that connects to nothing. Connectivity is a property of the drawing, checked once by a human at authoring time, not a property the generator has to be argued into every round.
 - **Readable buildings.** A hand-drawn floorplan has sightlines, chokepoints, and shortcuts that were *composed*. Both players learn the shape of a blueprint over a match and start playing against its geometry rather than re-scouting a stranger every round.
 - **Cheap validation.** Because the walls are fixed, the generator's output space is small and enumerable, so the automated checks (see [DEVELOPMENT.md](DEVELOPMENT.md), Phase 11) verify a role assignment rather than a graph.
+- **A blueprint is a thing you can steal.** Because the layout is authored rather than conjured at runtime, it exists as a document in the fiction — which is exactly what the Infiltrator carries in (see The Blueprint, under Player One). A generated maze couldn't have been on file anywhere.
 
 What the Warden still can't memorize is where anything *is*.
 

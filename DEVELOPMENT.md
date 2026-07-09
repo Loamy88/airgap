@@ -149,10 +149,20 @@ This is the phase that turns "Halcyon Site 7" from one hand-built map into a set
 - [ ] **Vault-spread constraint:** reject and reroll a role assignment whose 3 vaults are all in one wing or all mutually adjacent — the only real constraint in the whole generator, and it's a check on a set of ≤5 slot IDs, not a pathfind.
 - [ ] **Door typing pass:** roll each authored doorway as unlocked / lockpick-only (Phase 9's kit) / badge-gated, constrained so the slots that won Vault, Power, and Ops roles always sit behind a badge reader. Wire to Phase 4's door-log and plausibility-check backend.
 - [ ] **Item placement pass:** a large authored pool of found items; select a weighted-random subset (~4–6) and assign each to an `itemAnchor`, under a spread constraint (never all in one wing, never all on the shortest entrance→vault path). Feeds Phase 9's pickup/swap interaction.
+- [ ] **Map-item constraints:** the pool's map items (Map fragment, Maintenance schematic) need their own placement rules — a Maintenance schematic must never spawn inside a room it would reveal as a vault, and a Map fragment's revealed wing should be biased *away* from the wing it spawns in. Weight the schematic low; it's the strongest single item in the pool.
 - [ ] **Guard deployment pass:** choose which `guardPost` anchors are manned and which authored patrol loops are live, weighted toward the slots that won Vault/Power/Ops — deployment should be a legible tell about where the objective is. Feeds Phase 3's duty data and Phase 4's plausibility check.
 - [ ] **Sabotage fixture placement:** bind sensor relay boxes (disable a sensor cluster) and zone breaker panels (disable one room's lighting) to `sabotageFixtureMount` anchors in the rooms whose systems they control — interactable, sabotage-then-flag-for-repair, same pattern as the Power Room.
 - [ ] **Light + exfil resolution:** activate each placed dressing's `lightSource` anchors (feeding Phase 2); select which of the round's open entrances also serve as exfil points.
 - [ ] **Sensor mount exposure:** hand the Warden's setup UI (Phase 13) the blueprint's `sensorMount` list as the legal placement set — the Warden picks from the same anchors the generator does.
+- [ ] **Blueprint export for the Infiltrator:** derive, from the blueprint alone and *before* the role/anchor passes run, a structure-only view — rooms, corridors, doorways, vent runs, which entrances opened. This is the Infiltrator's starting map. Build it as a projection of the blueprint data, not as a redaction of the finished round: a redaction can leak through a bug, a projection has nothing to leak.
+
+### Part B2: The Infiltrator's blueprint screen
+Sits between Phase 5's Warden dashboard and Phase 9's gadgets; build it once the round generator can emit the structure-only export above.
+- [ ] **Blueprint UI:** toggleable overlay (also the Infiltrator's setup-phase view), rendering the structure-only export plus the player's own position. Rooms draw as blank outlines — no labels.
+- [ ] **Knowledge model, not a fog-of-war shader:** back it with an explicit per-round `InfiltratorKnowledge` store keyed by room ID / door ID / sensor ID, with an entry per fact and a source (`explored`, `map-item`, `spotted`). The UI renders that store and *only* that store, so a rendering bug can never reveal a room role the player hasn't earned. This is the same containment argument as the projection above.
+- [ ] **Reveal sources:** entering a room marks its role; interacting with a door marks its type; line-of-sight on a sensor pins it.
+- [ ] **Map items write into the same store:** Map fragment marks every room role + badge door in one wing; Maintenance schematic marks every room role, door type, and sabotage fixture facility-wide; Signal sniffer pins the nearest two sensors. Each is a bulk write, not a special rendering mode.
+- [ ] **Networking note (Phase 15):** the knowledge store is authoritative on the host and must never be replicated to the Warden's client, and the *unrevealed* half of the round's role table must never be replicated to the Infiltrator's. Default hosting is the Infiltrator's client, so the Warden's role table is the side actually at risk on a tampered client — worth listing as a known prototype-level trust gap.
 
 ### Part C: Per-round validation
 - [ ] **Round validator** (`-batchmode`, runs on every generated round in CI over N seeds): 3 vaults assigned, all reachable, spread constraint satisfied, ≥2 exfil points, exactly 1 Power Room and 1 Ops Room, 4–6 items placed and spread, every badge-gated door's room role is one of Vault/Power/Ops, no manned guard post orphaned from a live patrol loop. Because the blueprint is pre-validated, this pass is assertions over a role table — it should run thousands of seeds in seconds and is the natural CI regression gate.
@@ -175,7 +185,7 @@ A second NPC class, deliberately weaker and lower-fidelity than guards, whose wh
 - [ ] Badge-door interaction: Technicians open badge-locked doors on their route; the Infiltrator can tailgate through behind one, or use a Technician's predictable destination to plan an ambush (ties into Phase 9's ID-card slot and Phase 4's badge system).
 
 ## Phase 13 — Match Flow, Scoring, Best-of-3
-- [ ] Setup-phase timer and budget-spend UI (Warden), constrained to the round's `sensorMount` anchor set (Phase 11), + exterior-scout view (Infiltrator) showing the blueprint's shape and which entrances opened.
+- [ ] Setup-phase timer and budget-spend UI (Warden), constrained to the round's `sensorMount` anchor set (Phase 11), + the Infiltrator's blueprint screen (Phase 11 Part B2) as their setup-phase view.
 - [ ] Round timer and timeout-as-Warden-win handling.
 - [ ] Scoring table implementation (clean win / partial / early catch / timeout) and match total across 3 rounds.
 - [ ] Role swap between rounds, with a fresh `(blueprintId, seed)` roll each round. Whether the blueprint itself changes between rounds of a match, or holds while only the contents reshuffle, is a **balance question for Phase 16** — holding it makes a match a deepening read of one building; rerolling it keeps both players scouting.
@@ -200,6 +210,8 @@ By this point every phase has been built and tested against Phase 0 Part D's bar
 - [ ] Tune lockdown cost/cooldown and facility alert-level escalation.
 - [ ] Tune Technician count, flee-timeout, and abandonment threshold so sabotage is a real drain without being a solo win condition on its own.
 - [ ] Tune guard wake-timer length and plausibility-check sensitivity so the stealth-badge play pattern (quiet takedown → loot → matching-location door use) has a real, learnable window without being either trivial or worthless.
+- [ ] Tune the Maintenance schematic's spawn weight, and check whether "find the schematic" quietly becomes the Infiltrator's real objective every round — if the fastest line to the vault always runs through the item pool, the item pool is no longer optional and something is wrong.
+- [ ] Decide whether a match holds one blueprint across all 3 rounds or rerolls each round (see Phase 13) — a feel call, best made once there are 3–4 blueprints to test with.
 - [ ] Validate scoring weights actually reward the intended play patterns (near-miss vs. clean catch vs. clean steal).
 
 ## CI/Validation Loop (runs after each Claude Code phase)
