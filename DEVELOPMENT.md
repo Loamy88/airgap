@@ -163,7 +163,16 @@ Swap the rule-based generator from Phase 7 for the real system, behind the same 
 - [ ] Fallback path: keep the Phase 7 rule-based generator available as a low-spec/offline fallback.
 
 ## Phase 9 — Sensor Network & False Alarms
-- [ ] Motion sensors, pressure plates/tripwires, badge readers, network intrusion alerts — each pushes into the Facility Deployment map's sensor-dot layer from Phase 6.
+- [ ] Motion sensors, pressure plates/tripwires, badge readers — each pushes into the Facility Deployment map's sensor-dot layer from Phase 6.
+
+### The LUMEN alert channel
+A second, separate event bus from the sensor layer, and the split is the whole point: **sensors carry a position and no meaning; LUMEN alerts carry a meaning and no position.** Never let a LUMEN alert acquire a map coordinate — the moment one does, the system is dead.
+- [ ] **`LumenAlert { eventType, nodeId? }`** — no position field. Not "usually omitted": absent from the type. `nodeId` is populated *only* when the reporting node is behaving honestly (a healthy camera reports its own ID); an unauthenticated session has no identity to report, so `nodeId` is null.
+- [ ] **Alert catalogue:** unauthenticated terminal session, Ops Room table read, extraction in progress, looped-feed detection (delayed, no `nodeId` — a looped camera still claims to be healthy), camera lost, anomaly on unwatched feed (with `nodeId`).
+- [ ] **Interrupt overlay, not a fourth screen:** LUMEN alerts render over whichever monitor has focus and cannot be dismissed by switching screens. This is the only channel that bypasses Phase 6's focus model — everything else pings and waits.
+- [ ] **Ghost pass suppression:** while a Ghost pass is active the Infiltrator's session authenticates, so no unauthenticated-session alert fires. The alert is suppressed at the *source*, not filtered at the UI.
+- [ ] **Looped-feed detection:** a camera showing a repeating buffer raises an alert after a delay, with no `nodeId`. Sharpens looper-vs-jammer: the jammer is loud and specific, the looper is quiet and eventually vague.
+- [ ] **Validation:** assert no `LumenAlert` construction path can attach a coordinate, and that `nodeId` is null for every intrusion-class event. This is the same containment argument as Phase 12's blueprint projection — make the leak impossible to represent rather than remembering not to write it.
 - [ ] Camera Bank goes interactive: live-watch a feed for positive ID; unwatched feeds run a background anomaly check that can still ping (weaker, delayed).
 - [ ] Random false-alarm generator: low steady-rate background events per sensor type (wildlife, electrical flicker, wind), visually/audibly indistinguishable from a real trigger at the moment they fire.
 - [ ] Infiltrator-side false-alarm tools: noise maker (also drives sound events into Phase 2's bus) and signal jammer (spoofs a sensor node directly without the Infiltrator being present).
@@ -204,10 +213,21 @@ The Infiltrator transmits one order as CONTROL. Everything it needs already exis
 
 ## Phase 11 — Objectives: Hacking, Drive Extraction, Exfil
 - [ ] Terminal hack minigame: timed skill check, interruptible with retained progress.
-- [ ] Physical drive carry state: two-handed gadget lock while carrying, visible "loaded" tell.
 - [ ] Multi-vault objective handling: extraction can be started at any Data Vault candidate room (Phase 12) — all of them are real, and completing extraction at any single one ends the round immediately in the Infiltrator's favor.
 - [ ] Exfil point detection and win-condition wiring for both objective types.
-- [ ] Network intrusion alert integration (hacking risk, and the Surveillance/Ops Room hack from Phase 12, both tie back into Phase 9's sensor layer).
+- [ ] **Hack → LUMEN integration:** a rising per-second chance of raising an unauthenticated-session alert (Phase 9's LUMEN bus, no position). The Ops Room hack raises its own alert immediately and unconditionally. Ghost pass suppresses both at the source.
+
+### The drive as a world object
+The drive is **not** an inventory item and must not be modelled as one. It's a physical object in the world with a carrier reference that can be null.
+- [ ] **`Drive { position, carrier: Actor? }`** — no slot, no inventory. Costs neither a gadget slot nor the ID-card slot. Dropping sets `carrier = null` and leaves it where it stood; picking it up sets `carrier`. Guards and the Infiltrator use the same code path.
+- [ ] **Two-handed carry lock:** while `carrier == Infiltrator`, two-handed tools are disabled — the pry bar in particular, so a loaded Infiltrator can neither force a door nor melee-take-down a guard. The one-handed Tranquilizer pistol still works, which is deliberately the only violence available to someone holding the objective.
+- [ ] **Visible tell:** a carried drive changes the silhouette. A guard with a `clear` sight state on a carrier reports that they're carrying it.
+- [ ] **Telemetry ping:** every ~15s the drive reports a delayed, zone-level position to the Facility Deployment map, **regardless of carrier** — including `null`. The ping follows the drive, not the thief. This is physical infrastructure (knows where, not what), the mirror of the LUMEN bus.
+- [ ] **Guard recovery:** a guard who reaches an unattended drive picks it up and carries it back to a vault, where it must be extracted again. Dropping is never free. A guard carrying the drive keeps pinging, which makes them the most interesting target on the map.
+- [ ] **LUMEN goes dark on extraction:** the instant the drive leaves its rack, *all* LUMEN alerts stop for the rest of the round — anomaly detection included. Implement as unsubscribing the bus, not as filtering at the UI, so there is no path by which a stale alert can arrive afterward.
+- [ ] **Validation:** assert the drive can be dropped anywhere, that a dropped drive still pings, that a drive-carrying Infiltrator cannot invoke any two-handed tool, and that no LUMEN alert is emitted after extraction begins.
+
+The two objectives should now invert cleanly: the hack leaves the Warden an informant that knows *what* and not *where*; the drive leaves them a tracker that knows *where* and not *what*, and takes the informant away.
 
 ## Phase 12 — Round Generation: Room Roles, Anchors & Reshuffling
 Phase 3 drew the buildings. This phase makes their *contents* reshuffle every round — the anti-turtling backbone of the whole design. By now every other system has spent the entire project running against Phase 3's single hand-picked role assignment, so this phase swaps one function (`pick a role assignment`) and nothing else in the game notices.
@@ -245,7 +265,7 @@ Sits between Phase 6's Warden dashboard and Phase 10's gadgets; build it once th
 
 ### Part D: Room mechanics
 - [ ] **Power Room state machine:** blackout burst (all lighting/cameras/sensors down briefly) → degraded-power ("awaiting repair") state (dimmer lighting, partial sensor/camera outage). The state machine only tracks broken/fixed here; the actual repair dispatch is Phase 13.
-- [ ] **Surveillance/Ops Room:** hackable terminal exposing the same guard position/duty/alertness data the Warden's Facility Deployment screen reads, gated behind a slower hack and a guaranteed Network Intrusion ping (feeds Phase 9).
+- [ ] **Surveillance/Ops Room:** hackable terminal exposing the same guard position/duty/alertness data the Warden's Facility Deployment screen reads, gated behind a slower hack and a guaranteed LUMEN alert — *"someone is reading my surveillance tables"* — which names the system and not the room (feeds Phase 9).
 
 ## Phase 13 — Technicians & Repair
 A second NPC class, deliberately weaker and lower-fidelity than guards, whose whole job is clearing the "broken" flags Phase 12's sabotage fixtures and Phase 10's camera jammer set.
@@ -270,6 +290,7 @@ A second NPC class, deliberately weaker and lower-fidelity than guards, whose wh
 - [ ] Static/cutoff SFX for interrupted reports.
 - [ ] Ambient night/facility soundscape.
 - [ ] UI ping/alert sounds distinct per screen (Camera Bank vs. Guard Comms vs. Facility Deployment should each have a recognizable cue, including a distinct one for door/badge pings).
+- [ ] **LUMEN's voice:** distinct from every guard and from every UI cue — calm, unhurried, and not quite addressed to you. It interrupts whatever screen you're on, so it must be instantly identifiable as *not* a guard. This is the game's most important piece of audio characterization; the thing being stolen is talking to the person guarding it.
 
 ## Phase 16 — Networking Hardening
 By this point every phase has been built and tested against Phase 0 Part D's bare LAN scaffold. This phase upgrades that scaffold into something two players can actually use from different locations — it's not standing up networking for the first time.
@@ -293,6 +314,10 @@ By this point every phase has been built and tested against Phase 0 Part D's bar
 - [ ] **Watch for the "always bad" failure mode.** The Standard Kit is meant to be usually-wrong, not never-right. If playtesters stop considering the pry bar and flashlight entirely rather than agonizing over them, the tools have become dead weight and the temptation — which is the entire design goal — is gone. The health check is whether players *talk about* using them, not whether they do.
 - [ ] Tune the Maintenance schematic's spawn weight, and check whether "find the schematic" quietly becomes the Infiltrator's real objective every round — if the fastest line to the vault always runs through the item pool, the item pool is no longer optional and something is wrong.
 - [ ] Decide whether a match holds one blueprint across all 3 rounds or rerolls each round (see Phase 14) — a feel call, best made once there are 3–4 blueprints to test with.
+- [ ] Tune the drive's ping interval and zone precision. Too tight and the drop-as-bait play never works; too loose and carrying it costs nothing. The target is that a Warden can always answer "which wing" and never "which room."
+- [ ] **Check the two objectives actually feel different**, rather than being two timers. If Wardens play a hack round and a drive round the same way, the LUMEN-goes-dark trade isn't landing and the drive's telemetry is doing too little.
+- [ ] Watch whether the drive-drop is *too* strong. It pulls guards precisely, costs nothing to attempt, and the counterplay (a guard recovering it to a vault) may be too slow to matter. If so, the first lever is recovery speed, not the ping.
+- [ ] Tune LUMEN's alert delay. The hack alert should arrive early enough that the Warden has a real hunt on their hands, and vaguely enough that the hunt is hard. If Wardens learn to instantly check all three vaults on the first alert, the alert is too early or the vaults are too few.
 - [ ] Validate scoring weights actually reward the intended play patterns (near-miss vs. clean catch vs. clean steal).
 
 ## CI/Validation Loop (runs after each Claude Code phase)

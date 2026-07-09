@@ -115,16 +115,36 @@ Example pool (not exhaustive — meant to be large enough that no two rounds fee
 - **Backup tranq dart** — a single extra shot for the tranquilizer pistol, stacking with the base loadout.
 
 ### Methods to Steal the Data
-Two mutually exclusive objective types, chosen by the Warden's map setup (so the Infiltrator learns which one they're playing on entry, not before):
-- **Terminal hack:** a timed skill-check minigame at a fixed workstation in the data core. Interruptible — progress is retained if you're forced to break off, so a near-catch costs time, not a full reset. Stealthy but immobile.
-- **Physical drive pull:** extract a drive from the server room and *carry it* to an exfil point. Faster to start, but you're a visibly loaded target for the rest of the round — no two-handed gadgets while carrying, and the Warden knows exactly what to intercept.
+Two mutually exclusive objective types, chosen by the Warden's map setup (so the Infiltrator learns which one they're playing on entry, not before). They aren't two flavors of the same timer — they hand the Warden completely different information:
+
+- **Terminal hack:** a timed skill-check minigame at a fixed workstation in a vault. Interruptible — progress is retained if you're forced to break off, so a near-catch costs time, not a full reset. Stealthy but immobile. **LUMEN stays online and narrates the whole thing** (see LUMEN, under Warden): the Warden knows a terminal is being hacked within seconds, and spends the rest of the round working out which one. You are trading a stationary position for an enemy who knows *what* you're doing and not *where*.
+
+- **Physical drive pull:** take LUMEN's drive out of its rack and carry it to an exfil point. Faster to start, and it produces the two most interesting objects in the game.
+
+#### The Drive
+The drive is not an inventory item. It occupies **no gadget slot and no ID-card slot** — it's simply a thing you are carrying, in both hands.
+
+- **It's two-handed.** While carrying the drive you cannot use the pry bar (no forcing doors, no melee takedowns) or any other two-handed tool. The Tranquilizer pistol still works, which is the whole reason a loaded Infiltrator can still fight their way to an exit — quietly, at range, once.
+- **It's visible.** A carried drive is a legible silhouette. A guard who gets a clear look at you knows you have it, and says so.
+- **It broadcasts.** The drive is Halcyon's hardware and it never stopped talking to the building. Every fifteen seconds or so it reports a rough position to the Facility Deployment map. Not a marker — a zone, delayed. The Warden always knows approximately where the drive was, ten seconds ago.
+- **It can be put down.** Anywhere. Instantly.
+
+That last line is the whole system. **The ping follows the drive, not the thief.**
+
+Drop it in a storeroom two wings from the exfil point, and every guard the Warden repositions goes to the storeroom. Drop it and stand next to it in the dark, and you have baited a trap with the one object the Warden cannot ignore — a guard walks in, and a tranq dart is a very quiet sound. Drop it and genuinely leave, and you've bought yourself an unmonitored walk to the exit that ends in an unbearable decision, because a drive you left behind is a round you haven't won.
+
+A guard who reaches an unattended drive picks it up and walks it back to a vault, where it must be taken again. So dropping it is never free, and a guard carrying the drive is a guard worth a great deal of trouble.
+
+- **LUMEN goes dark.** The instant the drive leaves its rack, the facility's AI is no longer in the facility. Every LUMEN alert stops for the rest of the round: no anomaly detection, no unauthenticated-session warnings, nothing. The Warden feels the theft happen as their own systems going quiet.
+
+So the two objectives invert each other exactly. **The hack gives the Warden an informant who knows what and not where. The drive gives them a tracker that knows where and not what** — and takes the informant away. The Infiltrator chooses which half of the Warden's brain to leave intact.
 
 ### Methods to Trick the Sensors
 - Camera looper (visual cameras).
 - Crouch-walking and shadow-hugging (sound and light-based detection).
 - Thermal cloak (heat sensors).
 - Disguise or a Looted Badge (door/checkpoint scanners) — most doors don't need either, being simply unlocked or lockpick-only; badges matter only at the handful of higher-security doors that require one. See Doors & Badge Access, under Facility.
-- **Ghost pass:** a limited-use hack that spoofs your network credentials to Halcyon's access-control AI for 10s — beats *software* checks specifically (badge logs, terminal access alerts), not physical sensors.
+- **Ghost pass:** a limited-use hack that spoofs your network credentials to LUMEN for 10s — beats *software* checks specifically (badge logs, unauthenticated-session alerts), not physical sensors. The only tool aimed at LUMEN directly. See LUMEN, under Warden.
 - **Noise maker / signal jammer:** don't beat a sensor so much as feed it something to falsely report, drawing Warden attention to a location you aren't. See False Alarms.
 - **Cutting main power:** a blunt, facility-wide alternative to beating sensors one at a time — see Power & Blackouts, under Facility. Loud and unmissable to the Warden, but it doesn't discriminate between sensor types the way the other tools do.
 - **Sabotage (camera jammers, sensor relays, breaker panels):** doesn't trick a sensor so much as take it off the board entirely until the Warden spends a Technician to fix it — a slower, resource-attrition play rather than an in-the-moment dodge. See Sabotage, under Facility.
@@ -143,6 +163,8 @@ The Warden's UI is a wall of three separate monitors. Only one screen can hold f
   - Every placed sensor as a dot on the map — flashes when it triggers, real or false, and is clickable for detail (type, last-triggered time).
   - Every badge-gated door — shows open/closed state and, if it was opened on a badge, exactly which badge ID opened it (see Doors & Badge Access, under Facility).
   - The Technician panel — a count of available Technicians and the current list of broken fixtures to dispatch them to (see Technicians and Sabotage) — but, deliberately, no live Technician positions.
+
+Layered over all three, belonging to none of them: **LUMEN's alerts** (see LUMEN), which interrupt whichever screen has focus and can't be switched away from.
 
 If the Infiltrator cuts main power, the Camera Bank and a portion of the Facility Deployment's sensor layer go dark or degraded along with the facility's own lighting — the one event unmistakable enough to break through the Warden's usual screen-by-screen attention, precisely because it takes several systems away at once.
 
@@ -215,7 +237,7 @@ Notice what that last one means: the spoofer is weakest exactly where it would b
 
 1. **The forged order itself**, sitting on Guard Comms — a line they don't remember sending.
 2. **The guard's acknowledgment.** "Roger, holding." Even a Warden who missed the order sees a guard agreeing to something nobody said.
-3. **The transmitter ping.** The facility's radio network doesn't care whether a *guard* was fooled: it logs where every transmission physically originated, and a transmission claiming to be Control that came from inside the building is impossible. A delayed, imprecise origin ping — a zone, not a marker, exactly like a Network Intrusion alert — lands on the Facility Deployment map.
+3. **The transmitter ping.** The facility's radio network doesn't care whether a *guard* was fooled: it logs where every transmission physically originated, and a transmission claiming to be Control that came from inside the building is impossible. A delayed, imprecise origin ping — a zone, not a marker — lands on the Facility Deployment map. This is direction-finding, not LUMEN: physical infrastructure, knowing *where* and nothing about *what*.
 
 The third one is the design's answer to "how do you make deception fair." **The guard can be fooled; the network cannot.** Detection is guaranteed at the system level, and the only question is whether the Warden was *looking* — which is the question this entire game is about. There is no authentication code, no challenge-response, no checksum. The Infiltrator is not beating a lock. They are betting that somebody, somewhere, isn't paying attention.
 
@@ -260,17 +282,51 @@ The moment a guard keys their radio, the Infiltrator's Standard Kit radio scanne
 
 **Interruption:** if the Infiltrator takes a guard down mid-transmission, the message cuts off immediately — garbled, mid-word — right there on the Guard Comms screen. The Warden doesn't get the rest of the sentence, but a report cutting off *at all* is itself unambiguous information: a guard just went down, right about where they were reporting from.
 
+### LUMEN
+The thing being stolen is also, quietly, part of what's hunting you.
+
+LUMEN watches Halcyon's own systems and talks to the Warden about what it sees. It is not a fourth screen — it has no screen. **LUMEN's alerts interrupt whichever monitor the Warden is looking at**, arriving as a calm line of text over the top of it, and cannot be shut up by switching away. It is the only channel the Warden cannot choose to ignore, which is the compensation for its being nearly useless on its own.
+
+**LUMEN knows *what*. It does not know *where*.** Halcyon never gave it a floorplan — the whole point of the air gap is that they don't trust it, including with the shape of the building it lives in. So LUMEN reports events, never locations:
+
+> *"A terminal is being accessed. The session did not authenticate."*
+
+Not which terminal. There are three Data Vaults and an Ops Room on this map, and one of them has someone standing at a workstation right now. LUMEN has told the Warden that the round has begun in earnest and has not told them a single thing they can act on directly. Finding the terminal means cross-referencing everything else — who's near what, which cameras show an empty room, which sensors have been quiet in a way that's starting to look deliberate.
+
+This is the design's central information rule, and it runs both ways:
+
+> **Physical systems know where, but not what.** A motion sensor knows something moved here; it has no idea what. Radio direction-finding knows a transmission came from that sector; it can't read it.
+>
+> **LUMEN knows what, but not where.** It knows a terminal session is unauthenticated, a badge is being used by someone who shouldn't have it, a camera has been showing the same four seconds for a minute. It could not point at any of them on a map.
+
+The Warden's real job is marrying the two. Neither half is worth much alone, and every Infiltrator tool attacks one half or the other.
+
+**What LUMEN will tell you:**
+
+| Event | What LUMEN says |
+|---|---|
+| Terminal hack in progress | *"A terminal is being accessed. The session did not authenticate."* |
+| Ops Room hack | *"Someone is reading my surveillance tables."* — same alert shape, more specific system, still no room |
+| Camera looper running | *"One of my cameras has been showing me the same four seconds."* — delayed, and it can't say which |
+| Extraction underway (hack) | *"Someone is copying me."* |
+| Anomaly on an unwatched feed | *"Camera 04 is showing me something unusual."* — see below |
+
+**The exception that proves the rule.** LUMEN *can* name a camera, because a healthy camera reports its own node ID honestly, and the Warden knows where camera 04 is even though LUMEN doesn't. So LUMEN's passive anomaly detection on unwatched feeds — soft, delayed, imprecise about *what* it saw — still names the feed.
+
+The general principle: **LUMEN can name a node when the node is behaving honestly.** An intrusion, by definition, isn't. A hacked terminal presents no valid identity, so LUMEN sees an unauthenticated session on its network and nothing more. A jammed camera goes cleanly dark, so LUMEN names it. A *looped* camera is still claiming to be a healthy camera while lying, so LUMEN eventually notices that one of them is repeating itself — and can't tell you which one it is. That's the sharpest distinction yet between the camera looper and the camera jammer: the jammer takes a camera off the board loudly and specifically; the looper leaves a ghost in the system that surfaces late, vaguely, and everywhere at once.
+
+**Beating LUMEN.** The **Ghost pass** spoofs your network credentials to the access-control layer for 10 seconds — which is to say, it makes LUMEN briefly believe you're authorized. No unauthenticated session, no alert. It's the only tool in the game aimed at LUMEN specifically, and it's the reason the terminal hack has a rhythm rather than a timer: you can buy silence, in ten-second increments, at a cooldown.
+
 ### Software Systems Warnings
 - **Motion sensors** covering server-room approaches.
 - **Pressure plates / laser tripwires** in vents and maintenance corridors — the Infiltrator's favorite routes, so they're never free.
 - **Badge/access logs** — see Doors & Badge Access, under Facility, and Guard Identity & Status Checks, above, for the full system.
-- **Network intrusion alerts** — hacking a terminal has a rising chance per second of pinging the Facility Deployment map with a rough location, pressuring fast-but-risky play over slow-but-safe.
+- **Unauthenticated sessions** — hacking a terminal has a rising chance per second of raising a LUMEN alert. It names no location, but it does start the Warden hunting, which pressures fast-but-risky play over slow-but-safe.
 
 ### Other Sensors
 - **Drones** — a mobile camera the Warden can fly through open areas from a charge station; loud and visible, easy for the Infiltrator to spot, but covers ground fixed cameras can't reach.
 - **Biometric/heat scanners** at chokepoints — beaten only by the thermal cloak, not the camera looper.
 - **Microphones** — sound-based detection layered independently of the camera network, so noise discipline matters even out of camera view.
-- **Anomaly detection (LUMEN itself):** the facility's own AI passively watches unwatched camera feeds and flags "unusual behavior patterns" on the Camera Bank — a soft, delayed, imprecise ping (a general area, not a marker). Thematic hook: the thing being stolen is also, quietly, part of what's hunting you.
 
 ### False Alarms
 No screen can be trusted blindly — part of the Warden's skill is learning to weigh a ping instead of reflexively chasing every one.
@@ -304,7 +360,7 @@ Each room in a blueprint is a **slot**. A slot declares which **roles** it's eli
 
 - **Data Vault** — 5 slots per blueprint are vault-eligible; 3 are chosen each round, and **all three are real**. LUMEN can be extracted from any one of them, so a completed extraction at a single vault ends the round in the Infiltrator's favor. The 2 slots that lost the roll become filler, and look like it. This is the single biggest lever against turtling: a fixed setup-phase budget can't fortify three rooms the way it could one known Data Core, and the Warden can't even be sure which five slots were in the running unless they've learned the blueprint.
 - **Power Room** — 2–3 eligible slots, 1 chosen. Houses the facility's main breaker. See Power & Blackouts.
-- **Surveillance/Ops Room** — 2–3 eligible slots, 1 chosen. Houses a terminal mirroring the Warden's Facility Deployment screen: guard positions, duty, and alertness. Hacking it is slower than a normal terminal and immediately raises a Network Intrusion alert, so the Infiltrator is trading a loud, timed exposure for a temporary read of the same information the Warden gets for free.
+- **Surveillance/Ops Room** — 2–3 eligible slots, 1 chosen. Houses a terminal mirroring the Warden's Facility Deployment screen: guard positions, duty, and alertness. Hacking it is slower than a normal terminal and immediately makes LUMEN say *"someone is reading my surveillance tables"* — so the Warden knows the Ops Room is being hacked, and still has to work out where the Ops Room is. The Infiltrator trades a loud, timed exposure for a temporary read of the same information the Warden gets for free.
 - **Entrance** — every blueprint authors 4–6 exterior entry points (loading dock, maintenance hatch, roof access, service tunnel); a subset opens each round, and which ones is rolled. A sealed entrance is visibly sealed, so the exterior scout is real information.
 - **Office / Admin** — open-plan and corridor rooms forming the connective tissue between entrances and the vault cluster. Carry most of the vents and crawlspaces. Rarely role-swapped; they're the blueprint's skeleton.
 - **Filler** — storage rooms, GPU racks, breakrooms, archive stacks: no unique mechanic, just square footage, sightline breaks, and places to wait out a patrol. Every slot that doesn't win a special role falls back to filler, drawn from a set of filler dressings so the same slot doesn't look identical two rounds running.
