@@ -54,13 +54,26 @@ The blueprint fills in as you play. Rooms you've entered keep their contents mar
 
 It can also be filled in by *finding a better copy of itself*. Several entries in the item pool are maps — a **Map fragment** labels one wing, and the rare **Maintenance schematic** labels the entire building, vaults included (see Found Items). Nothing in the facility was ever going to hand you the Warden's sensor placements or guard orders, but the building's own engineering drawings are lying around in it, and they know exactly what every room is. That's the item-pool chase in one line: the thing most worth finding is the answer to *where is the thing worth finding*.
 
+### Standard Kit
+Three things the Infiltrator always carries, alongside the blueprint above. They cost no gadget slot, have no charges, and are never chosen at setup — they're what you brought because you'd be a fool not to. Each is a *tool with a tell*: it solves a problem and announces you solving it, so the live question is never "do I have this" but "can I afford to use it here."
+
+- **Flashlight** — a narrow beam, toggled on and off. The facility is dark, and there are corners of it you genuinely cannot read without light. But light is the hazard, not the remedy (see Movement & Stance): the beam lifts you out of shadow and drags a moving light pool around with you, and it is the single most legible thing a guard or camera can catch. A flashlight sweeping a wall is a *clearer* sighting for a guard than the person holding it would be. Off by default, and the temptation to flick it on is the point.
+
+- **Pry bar** — short, blunt, two-handed, and the answer to two very different problems:
+  - **Forcing a door.** Any door that isn't badge-gated can be broken open with repeated hits — no lockpick, no skill check, just time and violence. Every hit is a loud sound event that carries a long way, and a forced door *stays* visibly forced, so anyone who walks past it later knows someone came through. It's the answer to a locked door when you didn't bring the Lockpick kit, and it's a bad one. **Badge-gated doors are immune** — reinforced, no hit count, no exceptions. The vault cluster, the Power Room, and the Ops Room can never be pried, which is what keeps the whole badge economy load-bearing.
+  - **Taking down a guard.** Approach from outside their vision cone, reach melee range, and the takedown is automatic, silent, and non-lethal — they drop to `Down`, no radio report, badge lootable (see Guard Identity & Status Checks, under Warden). But **if the guard has a clear sighting of you at close range, they catch you.** Not a fight you might win: a clear ID inside melee range is a capture and the round is over. The pry bar is a stealth verb, not a weapon — only ever the reward for having already won the positioning. Walking at a guard holding it is the fastest way to lose a round. This is exactly what a gadget slot buys you: the Tranquilizer pistol works at range and from the front; the pry bar never does.
+
+- **Radio scanner** — an always-on earpiece on the guards' channel. It doesn't tell you *what* a nearby guard is reporting, only that they've keyed their radio: a burst of static, and roughly the direction it came from. You learn that you've been seen, and that the Warden is right now reading a sentence about you, a few seconds before anything happens. Whether that sentence is "uh, control, I might have something" or a clean ID, you never find out. It's the thinnest possible window into the Warden's information, and its whole job is turning *I think I got away with that* into *I definitely did not*.
+
+Nothing here makes the Infiltrator better in a fight, because the Infiltrator is never in a fight. Two of the three actively make it *easier* to be caught if used carelessly — a test any future addition to this tier should have to pass.
+
 ### Movement & Stance
 - Crouch / walk / sprint, each with a visible noise-radius indicator — sprinting is loud and pings sound-based sensors.
 - Vents, crawlspaces, and maintenance corridors act as shortcut tiles that bypass patrolled routes entirely.
 - A light-level meter reflects whether you're standing in a light pool or in shadow — shadow is the default stealth state at night, so light (a lamp, an open door, a guard's torch beam) is the hazard, not the reverse.
 
 ### Weapons & Gadgets
-Non-lethal only, by design — an Infiltrator who can fight their way out flattens the asymmetry the whole game is built on. Loadout for a round is 3 gadgets, chosen before the setup phase ends:
+Non-lethal only, by design — an Infiltrator who can fight their way out flattens the asymmetry the whole game is built on. On top of the Standard Kit above, the loadout for a round is 3 gadgets, chosen before the setup phase ends:
 
 - **Tranquilizer pistol** — silent, short range, drops a guard for ~30s. 3 shots per round.
 - **Stun/EMP tool** — melee-range guard takedown, or thrown to short a camera/sensor for 5s.
@@ -68,7 +81,7 @@ Non-lethal only, by design — an Infiltrator who can fight their way out flatte
 - **Camera jammer** — a plant-and-leave device that kills a camera's feed indefinitely, until the Warden dispatches a Technician to physically remove it (see Sabotage, under Facility). Where the looper is a quick, subtle beat, the jammer is a standing problem you're deliberately leaving behind.
 - **Noise maker** — throwable that pulls a guard's attention to a location. Doubles as a deliberate false alarm (see below).
 - **Signal jammer** — planted device that spoofs a sensor into reporting a false trigger without you needing to pass through it. Pure misdirection tool, no stealth benefit of its own.
-- **Lockpick / bypass kit** — opens doors and terminals faster; a failed pick has a chance to trip a silent alarm.
+- **Lockpick / bypass kit** — opens doors and terminals faster and, above all, *quietly* — the considered alternative to the pry bar's noise. A failed pick has a chance to trip a silent alarm.
 - **Thermal cloak** — 8s of immunity to thermal/IR cameras only — doesn't help against visual cameras, guards' eyes, or microphones, forcing you to pick the right tool per sensor.
 - **Disguise (stolen badge/uniform)** — a generic, untraceable fake credential brought into the round as a loadout pick; walk past guards and badge scanners at range, though face/ID-verifying cameras still flag it. Distinct from a Looted Badge, below — this one was never tied to a real person, so it can't be flagged the way a looted one can.
 
@@ -159,6 +172,8 @@ Each guard tracks, in real time:
 
 When a guard's perception crosses their current alert threshold, after a quick 0.5 - 1.5 second delay, they key their radio, and their **report is generated live, word by word, by a small language model** fed a structured snapshot of exactly that guard's sight/sound/memory state and their alertness. The Warden reads it forming in real time on the Guard Comms screen — a report might start vague ("uh, control, I might have—") and sharpen as it goes, or stay vague if that's genuinely all the guard has.
 
+The moment a guard keys their radio, the Infiltrator's Standard Kit radio scanner picks up the key-up as a burst of static with a rough direction — so both players learn a report is happening at the same instant, and only one of them gets to read it.
+
 **Interruption:** if the Infiltrator takes a guard down mid-transmission, the message cuts off immediately — garbled, mid-word — right there on the Guard Comms screen. The Warden doesn't get the rest of the sentence, but a report cutting off *at all* is itself unambiguous information: a guard just went down, right about where they were reporting from.
 
 ### Software Systems Warnings
@@ -180,6 +195,7 @@ No screen can be trusted blindly — part of the Warden's skill is learning to w
 
 ### Catching the Other Player
 - **Guard capture:** a guard whose alert state reaches Alarmed and who closes to melee range automatically subdues the Infiltrator non-lethally — this is autonomous guard behavior, not something the Warden directly executes. It also recovers any stolen drive back to the facility, which matters if the Infiltrator was already carrying it toward exfil.
+- **Close-range sighting:** a guard who gets a *clear* sighting of the Infiltrator inside melee range captures them on the spot, whatever their alert state — there is no reaction window and no melee exchange to win. This is what makes the Standard Kit's pry bar a positioning tool rather than a weapon: approach from behind and the guard goes down silently; approach from the front and you have simply lost.
 - **Lockdown:** facility-wide state, sealing all doors but one monitored choke point and spawning two reserve guards there. Costs a full alert-meter charge (built from sustained Suspicious/Searching reports across the facility, not available turn one) and has a 90-second cooldown once triggered.
 - **Environmental traps:** Warden-triggered doors, gas vents, or floor panels, placed during setup — one-shot per round, and visible to the Infiltrator once triggered (fires a tell, not an instakill, so it's a repositioning threat rather than a coin-flip death).
 
@@ -238,7 +254,7 @@ Beyond cutting main power, the Infiltrator has a handful of ways to break someth
 Every one of these sits on the Warden's board as a standing problem until it's resolved — a Warden who's already spent their Technicians chasing sabotage elsewhere is, for a while, just short a camera, a light, or a working sensor cluster, on top of whatever the Infiltrator does next.
 
 ### Doors & Badge Access
-Doorways are fixed by the blueprint; their *type* is rolled. Most interior doors come up either unlocked or simply locked — beatable with the Lockpick/bypass kit, no badge involved. Badge readers are constrained to a smaller set of higher-security doors: whichever slots won the Data Vault, Power Room, and Surveillance/Ops roles this round always sit behind one. So a stolen badge is a shortcut on a few real chokepoints, not a universal key — and a badge reader appearing on a door that was unlocked last round is itself a hint about what's now behind it.
+Doorways are fixed by the blueprint; their *type* is rolled. Most interior doors come up either unlocked or simply locked — beatable quietly with the Lockpick/bypass kit, or loudly with the Standard Kit's pry bar, no badge involved. Badge-gated doors can be neither picked nor forced. Badge readers are constrained to a smaller set of higher-security doors: whichever slots won the Data Vault, Power Room, and Surveillance/Ops roles this round always sit behind one. So a stolen badge is a shortcut on a few real chokepoints, not a universal key — and a badge reader appearing on a door that was unlocked last round is itself a hint about what's now behind it.
 
 - **Every badge-gated door is on the Facility Deployment map**, showing open/closed state and, if it was opened on a badge, exactly which badge ID opened it — guard or Technician (see The Screens, under Warden).
 - **Plausibility check.** The system knows a guard's current duty/post and a Technician's last dispatch destination. A badge used on a door nowhere near its owner's expected location raises a passive suspicion ping — softer than a hard Badge Flag, but still a tell, and it fires whether or not that badge has been flagged yet.

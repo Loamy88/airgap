@@ -59,6 +59,7 @@ Single test room, no AI yet — just prove movement and stealth *feel* before ad
 - [ ] Player visibility sampling: is the Infiltrator's tile in shadow or light right now (feeds the light-level meter).
 - [ ] Guard vision cone: raycast/shape-cast with distance and light-level falloff, producing a visibility category (none / silhouette / partial / clear), not just a boolean.
 - [ ] Sound event system: emitters (footstep, sprint, gadget) broadcast type + loudness + location; anything in range "hears" it. This same event bus feeds guards, microphones, and the sensor systems later.
+- [ ] **Infiltrator flashlight** (Standard Kit): a toggleable cone `Light2D` parented to the player, feeding the *same* visibility sampling as every other light source — so turning it on genuinely raises your own light level and lights the wall you're pointing at. Build it here rather than with the gadgets (Phase 10); it's a lighting feature, and having it early makes the Phase 2 feel playtest honest about how dark the game actually is.
 
 ## Phase 3 — Map Creation: Blueprint Authoring & The Facility Kit
 The building itself, drawn by hand, before anything is generated on top of it. This lands here — right after movement and lighting, well before guards — for one reason: **every phase after this one needs a real facility to be built inside.** Guard patrol loops (Phase 4), the Warden's map screen (Phase 6), badge doors (Phase 5), sensor mounts (Phase 9), room objectives (Phase 11) all reference the blueprint's authored data. Building them against a single grey test room and retrofitting the map later means writing every one of those systems twice.
@@ -70,6 +71,7 @@ This phase produces **no randomness and no generation code.** It produces one ha
 - [ ] **Anchor schema per room:** named, fixed points for `itemAnchor`, `guardPost` (position + facing), `lightSource`, `sensorMount`, `sabotageFixtureMount`. Nothing in the game is ever placed at a runtime-computed position.
 - [ ] **Patrol loop schema:** each blueprint carries a set of complete, closed waypoint loops with stable IDs.
 - [ ] **Room role + dressing schema:** what a role is (vault / power / ops / office / filler-*), and what a dressing supplies (a prefab, its own light anchors, its own item anchors).
+- [ ] **Door schema:** per doorway — type (unlocked / locked / badge-gated), `forceable` (derived: true for everything except badge-gated), a hit count to force, and a persistent `forced` flag that survives the rest of the round. Authored here so Phase 5's attribution log and Phase 12's door typing both have a place to write.
 
 ### Part B: Draw the first blueprint
 - [ ] **Author Blueprint 01** end-to-end as data + tilemap prefabs: ~16 rooms, corridors, doorways, the vent network, 4–6 exterior entrances. This is a level-design task with a human in the loop — Claude Code writes the data, you look at it in the editor and say whether the building is any good.
@@ -92,6 +94,7 @@ This phase produces **no randomness and no generation code.** It produces one ha
 - [ ] Warden-set baseline **Alertness** (Relaxed / Standard / Heightened) as a modifier on ladder sensitivity and speed, separate from the ladder state itself.
 - [ ] Short rolling per-guard memory buffer (last ~60s of personally perceived sight/sound events) — this becomes the input to the report-generation system (Phases 6–7), so get the data structure right here even before there's a language model consuming it.
 - [ ] Alarmed-guard auto-engage/capture behavior on reaching the Infiltrator.
+- [ ] **Close-range clear-sighting capture:** a guard with visibility category `clear` on the Infiltrator inside melee range captures immediately, at *any* rung of the alertness ladder — no reaction delay, no escalation first. This is the rule that makes the pry-bar takedown (Phase 10) a positioning problem rather than a melee exchange, so it belongs with guard perception, not with the tool.
 - [ ] **Guard ID assignment:** every guard spawns with a persistent, unique display ID (e.g. `"G-04"`) that survives duty/alertness reassignment — feeds Phase 5's identity system and Phase 6's map icons.
 
 At the end of this phase the game should be playable end-to-end with placeholder/no dialogue — a single guard walking one of Blueprint 01's authored patrol loops, noticing, escalating, and catching the Infiltrator in a real building. This is the core loop's true minimum viable version; don't move on until it's fun.
@@ -142,8 +145,19 @@ Swap the rule-based generator from Phase 7 for the real system, behind the same 
 - [ ] Tuning pass: false-alarm rate should be noticeable but not so frequent that ignoring pings becomes the dominant strategy.
 
 ## Phase 10 — Infiltrator Gadget Kit
+
+### Part A: Standard Kit (always carried, no slot cost)
+Build this before the loadout gadgets — it's the baseline verb set every gadget is balanced *against*, and two of its three pieces already have their systems in place (Phase 2's lighting, Phase 4's perception).
+- [ ] **Flashlight:** wire Phase 2's cone light to a toggle, and confirm it raises the player's own sampled light level rather than merely rendering.
+- [ ] **Pry bar — door forcing:** hold-to-swing against any doorway with `forceable: true` (Phase 3's door schema). Each swing emits a high-loudness sound event onto Phase 2's bus and decrements the door's hit count; on reaching zero the door opens and its `forced` flag latches for the round. Badge-gated doors reject the interaction outright — no partial progress, no hit count.
+- [ ] **Pry bar — silent takedown:** a prompt available only when the Infiltrator is inside melee range *and* outside the target's vision cone. Transitions the guard to `Down` (Phase 5's consciousness machine) with **no** report enqueued, badge flagged lootable. Deliberately no animation-cancel window and no contest — it either was available or it wasn't, and Phase 4's close-range clear-sighting capture is what punishes getting it wrong.
+- [ ] **Pry bar vs. Technicians:** the same takedown works, but only before flee state engages (Phase 13); once fleeing, a Technician outruns the Infiltrator's sprint and only a tranq dart stops one.
+- [ ] **Radio scanner:** subscribe to the guard radio key-up event (Phase 7/8's report trigger) and surface it to the Infiltrator as a directional static burst — **never the report text**, which is the Warden's alone. The event fires on key-up, not on report completion, so both players learn a transmission is happening on the same frame.
+- [ ] **Validation:** a `-batchmode` test asserting the pry bar cannot open a badge-gated door, cannot take down a guard inside their vision cone, and that no takedown path enqueues a report.
+
+### Part B: Loadout gadgets
 - [ ] Tranquilizer pistol, stun/EMP tool, camera looper, camera jammer, lockpick/bypass kit, thermal cloak, disguise, ghost pass, signal jammer.
-- [ ] 3-gadget loadout selection UI at the end of setup phase.
+- [ ] 3-gadget loadout selection UI at the end of setup phase. The Standard Kit is not shown here — it isn't a choice.
 - [ ] Per-gadget cooldowns/charges and their interaction with the sensor systems from Phase 9 (e.g. thermal cloak vs. heat sensors specifically, not sensors generally).
 - [ ] Camera jammer as a persistent, stateful plant (not a timed effect like the looper) — flags the target camera as "broken," to be picked up by Phase 13's repair system.
 - [ ] Inventory swap-to-pickup interaction: walking onto a found item (spawned by Phase 12) prompts a drop-one-to-take-one swap against the current 3 slots; dropped gadgets persist in the world.
@@ -232,6 +246,8 @@ By this point every phase has been built and tested against Phase 0 Part D's bar
 - [ ] Tune lockdown cost/cooldown and facility alert-level escalation.
 - [ ] Tune Technician count, flee-timeout, and abandonment threshold so sabotage is a real drain without being a solo win condition on its own.
 - [ ] Tune guard wake-timer length and plausibility-check sensitivity so the stealth-badge play pattern (quiet takedown → loot → matching-location door use) has a real, learnable window without being either trivial or worthless.
+- [ ] Tune the pry bar's door hit count and swing loudness. This number decides whether the Lockpick kit is worth a gadget slot at all: too few hits and picking is pointless, too many and locked doors become walls. The Standard Kit must never make a loadout choice redundant.
+- [ ] Check the flashlight is actually used. If the facility is lit well enough that nobody ever turns it on, the darkness isn't doing its job; if it's so dark that everyone leaves it on permanently, the light-as-hazard rule has collapsed. The target is a tool reached for reluctantly, a few times a round.
 - [ ] Tune the Maintenance schematic's spawn weight, and check whether "find the schematic" quietly becomes the Infiltrator's real objective every round — if the fastest line to the vault always runs through the item pool, the item pool is no longer optional and something is wrong.
 - [ ] Decide whether a match holds one blueprint across all 3 rounds or rerolls each round (see Phase 14) — a feel call, best made once there are 3–4 blueprints to test with.
 - [ ] Validate scoring weights actually reward the intended play patterns (near-miss vs. clean catch vs. clean steal).
