@@ -1,2 +1,49 @@
 # Claude files
 .claude/
+
+# Machine-local environment (Unity paths etc.)
+.env
+
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Never ignore Asset meta data
+!/[Aa]ssets/**/*.meta
+
+# IDE
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.slnx
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity crash reports / OS junk
+sysinfo.txt
+*.stackdump
+crashlytics-build.properties
+Thumbs.db
+.DS_Store
+
+# Build artifacts
+*.apk
+*.aab
+*.unitypackage
+*.app

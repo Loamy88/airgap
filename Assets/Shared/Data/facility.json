@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "description": "Match/round structure, Infiltrator movement/noise config, room role recipe, doors, drive, LUMEN, lockdown, and scoring. Reference data — not runtime-loaded yet. Numbers marked tunable are Phase 17 surfaces.",
+
+  "match": {
+    "bestOfRounds": 3,
+    "roleSwapEachRound": true,
+    "setupPhaseSeconds": 60,
+    "roundSeconds": 540,
+    "roundSecondsRange": { "min": 480, "max": 600 },
+    "timeoutWinner": "warden"
+  },
+
+  "scoring": {
+    "table": [
+      { "outcome": "clean-extraction-and-exfil", "infiltrator": 3, "warden": 0 },
+      { "outcome": "caught-mid-extraction", "infiltrator": 1, "warden": 2 },
+      { "outcome": "caught-before-extraction", "infiltrator": 0, "warden": 3 }
+    ],
+    "timeoutRule": "scored by current extraction state at expiry"
+  },
+
+  "infiltrator": {
+    "moveSpeeds": { "crouch": 1.4, "walk": 2.6, "sprint": 4.8 },
+    "noiseLoudness": { "crouch": 0.1, "walk": 0.35, "sprint": 0.8 },
+    "noiseRadiusDebugColor": "green",
+    "lightLevels": ["shadow", "dim", "lit"],
+    "stanceNote": "Noise values feed the probabilistic hearing model in guards.json; radii are debug visualization only — hearing has no hard radius."
+  },
+
+  "roomRoles": {
+    "recipe": {
+      "vault": { "eligibleSlots": 5, "chosen": 3, "note": "all three real; extraction at any one wins" },
+      "power": { "eligibleSlots": { "min": 2, "max": 3 }, "chosen": 1 },
+      "ops": { "eligibleSlots": { "min": 2, "max": 3 }, "chosen": 1 },
+      "entrances": { "authored": { "min": 4, "max": 6 }, "open": "subset, rolled per round" },
+      "fallback": "filler with rolled dressing"
+    },
+    "vaultSpreadConstraint": "reject role assignments with all 3 vaults in one wing or all mutually adjacent",
+    "roles": ["vault", "power", "ops", "entrance", "office", "filler"]
+  },
+
+  "doors": {
+    "types": ["unlocked", "locked", "badge-gated"],
+    "forceableRule": "everything except badge-gated",
+    "defaultForceHitCount": 5,
+    "forcedFlagPersists": true,
+    "badgeGatedConstraint": "Vault, Power, and Ops slots always sit behind a badge reader",
+    "attributionLog": ["openClosedState", "lastOpenerBadgeId"]
+  },
+
+  "objectives": {
+    "terminalHack": {
+      "interruptible": true,
+      "progressRetained": true,
+      "hackSeconds": 45,
+      "lumenAlertChancePerSecond": 0.03,
+      "lumenAlertRamps": true,
+      "opsRoomHack": { "slowerMultiplier": 1.5, "lumenAlertImmediate": true }
+    },
+    "drivePull": {
+      "twoHanded": true,
+      "disables": ["pry-bar", "any two-handed tool"],
+      "visibleTell": "carried drive changes the silhouette; a clear sighting reports it",
+      "telemetry": { "pingIntervalSeconds": 15, "pingDelaySeconds": 10, "precision": "zone", "followsDriveNotCarrier": true },
+      "guardRecovery": "a guard reaching an unattended drive carries it back to a vault; it keeps pinging en route",
+      "lumenGoesDark": "all LUMEN alerts stop the instant the drive leaves its rack — implemented as bus unsubscribe, not UI filtering"
+    }
+  },
+
+  "lumen": {
+    "alertShape": { "eventType": "required", "nodeId": "nullable", "position": "NOT REPRESENTABLE — no field exists" },
+    "nodeIdRule": "populated only when the reporting node is behaving honestly; null for every intrusion-class event",
+    "catalogue": [
+      { "eventType": "unauthenticated-session", "nodeId": null },
+      { "eventType": "ops-table-read", "nodeId": null },
+      { "eventType": "extraction-in-progress", "nodeId": null },
+      { "eventType": "looped-feed-detected", "nodeId": null, "delayed": true },
+      { "eventType": "camera-lost", "nodeId": "cameraId" },
+      { "eventType": "unwatched-feed-anomaly", "nodeId": "cameraId", "delayed": true }
+    ],
+    "presentation": "interrupt overlay over the focused screen; cannot be dismissed by switching screens"
+  },
+
+  "wardenActions": {
+    "lockdown": {
+      "cost": "one full alert-meter charge",
+      "cooldownSeconds": 90,
+      "effect": "seal all doors but one monitored choke point; spawn 2 reserve guards there"
+    },
+    "facilityAlertLevels": ["green", "yellow", "orange", "red"],
+    "alertLevelEffects": "higher tiers add roaming reserve guards and shorten lockdown cooldown"
+  },
+
+  "sensors": {
+    "types": ["camera", "motion", "pressure-plate", "tripwire", "microphone", "heat-scanner", "drone-station", "trap"],
+    "deterministicRule": "machines never roll — authored coverage, exact edges, learnable by the Infiltrator",
+    "falseAlarms": {
+      "backgroundRatePerSensorPerMinute": 0.08,
+      "causes": ["wildlife", "wind-debris", "electrical-flicker", "guard-own-footsteps"],
+      "rule": "indistinguishable from a real trigger at the moment it fires"
+    }
+  },
+
+  "radio": {
+    "orderChannelWindowSeconds": 5,
+    "transmitterOriginPing": {
+      "delaySeconds": 8,
+      "precision": "zone",
+      "rule": "every transmission logs physical origin; inside-facility CONTROL transmissions are impossible — detection guaranteed, noticing is the Warden's job"
+    }
+  },
+
+  "powerRoom": {
+    "blackoutBurstSeconds": 4,
+    "degradedState": {
+      "lightingMultiplier": 0.5,
+      "sensorOutageFraction": 0.4,
+      "persistsUntil": "Technician repair at the Power Room"
+    }
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "description": "All Infiltrator tools: Standard Kit (always carried, no slot), the 9 loadout gadgets (pick 3 at setup), and the found-item pool (4-6 spawn per round on item anchors). Reference data for Phases 10/12 — not runtime-loaded yet.",
+
+  "slots": {
+    "gadgetSlots": 3,
+    "idCardSlots": 1,
+    "idCardSlotRule": "Separate single-capacity slot for one looted badge; looting a second forces drop-and-swap. Never costs a gadget slot.",
+    "pickupRule": "Picking up a found item means dropping a current gadget in its place; dropped gadgets persist in the world."
+  },
+
+  "standardKit": [
+    {
+      "id": "flashlight",
+      "displayName": "Flashlight",
+      "hands": 1,
+      "charges": null,
+      "toggleable": true,
+      "beamAngleDegrees": 35,
+      "beamRange": 6.0,
+      "selfLightLevelWhenOn": "lit",
+      "note": "Feeds the same visibility sampling as every other light source — raises the carrier's own light level. Off by default."
+    },
+    {
+      "id": "pry-bar",
+      "displayName": "Pry bar",
+      "hands": 2,
+      "charges": null,
+      "doorForce": {
+        "worksOn": "forceable doors only (never badge-gated)",
+        "swingLoudness": 0.9,
+        "swingSeconds": 1.5,
+        "noisePerSwing": "one independent notice-roll per guard in plausible earshot, per swing",
+        "partialProgressPersists": true,
+        "forcedFlagPersists": true
+      },
+      "takedown": {
+        "range": 1.0,
+        "requires": "inside melee range AND outside target's vision cone",
+        "result": "target Down, silent, no report enqueued, badge lootable",
+        "failureMode": "clear sighting inside melee range = immediate capture (guard rule, not tool rule)",
+        "vsTechnician": "works only before flee state engages"
+      }
+    },
+    {
+      "id": "radio-scanner",
+      "displayName": "Radio scanner",
+      "hands": 0,
+      "charges": null,
+      "receiveOnly": true,
+      "signal": "directional static burst on guard radio key-up — never report text",
+      "timing": "fires on key-up, not report completion; both players learn of a transmission on the same frame"
+    }
+  ],
+
+  "loadoutGadgets": [
+    {
+      "id": "tranq-pistol",
+      "displayName": "Tranquilizer pistol",
+      "hands": 1,
+      "charges": 3,
+      "cooldownSeconds": 0,
+      "range": 7.0,
+      "effect": { "type": "guard-down", "durationSeconds": 30 },
+      "silent": true,
+      "note": "Short range, silent. The only violence available while carrying the drive."
+    },
+    {
+      "id": "stun-emp",
+      "displayName": "Stun/EMP tool",
+      "hands": 1,
+      "charges": 2,
+      "cooldownSeconds": 10,
+      "range": 4.0,
+      "effect": { "type": "dual", "melee": "guard-down", "thrown": "camera-or-sensor-shorted-5s", "durationSeconds": 5 }
+    },
+    {
+      "id": "camera-looper",
+      "displayName": "Camera looper",
+      "hands": 1,
+      "charges": 3,
+      "cooldownSeconds": 15,
+      "range": 5.0,
+      "effect": { "type": "camera-loop", "loopBufferSeconds": 4 },
+      "lumenTell": "delayed looped-feed alert, no nodeId — quiet and eventually vague"
+    },
+    {
+      "id": "camera-jammer",
+      "displayName": "Camera jammer",
+      "hands": 1,
+      "charges": 1,
+      "cooldownSeconds": 0,
+      "range": 0.5,
+      "effect": { "type": "sabotage-plant", "target": "camera", "persistsUntilRepaired": true },
+      "lumenTell": "immediate camera-lost alert with nodeId — loud and specific"
+    },
+    {
+      "id": "noise-maker",
+      "displayName": "Noise maker",
+      "hands": 1,
+      "charges": 2,
+      "cooldownSeconds": 5,
+      "range": 10.0,
+      "effect": { "type": "sound-event", "loudness": 0.7, "atThrownPosition": true },
+      "note": "Drives a real event onto the Phase 2 sound bus; doubles as a deliberate false alarm."
+    },
+    {
+      "id": "signal-jammer",
+      "displayName": "Signal jammer",
+      "hands": 1,
+      "charges": 2,
+      "cooldownSeconds": 20,
+      "range": 6.0,
+      "effect": { "type": "sensor-spoof", "firesFalseTrigger": true },
+      "note": "Spoofs a sensor node without the Infiltrator being present. Pure misdirection."
+    },
+    {
+      "id": "lockpick-kit",
+      "displayName": "Lockpick / bypass kit",
+      "hands": 2,
+      "charges": null,
+      "cooldownSeconds": 0,
+      "effect": { "type": "quiet-open", "worksOn": "locked doors and terminals (never badge-gated)", "pickSeconds": 6, "failSilentAlarmChance": 0.15 },
+      "note": "The considered alternative to the pry bar's noise. Exists to buy the pry-bar risk away — Phase 17 checks it stays worth a slot."
+    },
+    {
+      "id": "thermal-cloak",
+      "displayName": "Thermal cloak",
+      "hands": 0,
+      "charges": 2,
+      "cooldownSeconds": 30,
+      "effect": { "type": "immunity", "vs": ["thermal", "infrared"], "durationSeconds": 8 },
+      "note": "Beats heat sensors specifically — not visual cameras, guards' eyes, or microphones."
+    },
+    {
+      "id": "disguise",
+      "displayName": "Disguise (fake badge/uniform)",
+      "hands": 0,
+      "charges": 1,
+      "effect": { "type": "credential", "generic": true, "traceable": false },
+      "note": "Never tied to a real person, so it can't be flagged the way a looted badge can. Face/ID-verifying cameras still catch it."
+    },
+    {
+      "id": "ghost-pass",
+      "displayName": "Ghost pass",
+      "hands": 0,
+      "charges": 3,
+      "cooldownSeconds": 25,
+      "effect": { "type": "network-credential-spoof", "durationSeconds": 10, "suppresses": ["unauthenticated-session-alert", "badge-log-anomaly"] },
+      "note": "The only tool aimed at LUMEN directly. Suppression happens at the source, not the UI (Phase 9)."
+    }
+  ],
+
+  "foundItems": [
+    { "id": "grapple-line", "displayName": "Grapple line", "spawnWeight": 1.0, "effect": "fast one-way traversal to a slow/high route" },
+    { "id": "smoke-canister", "displayName": "Smoke canister", "spawnWeight": 1.0, "effect": "blocked line of sight in a small area for a few seconds" },
+    { "id": "adrenaline-shot", "displayName": "Adrenaline shot", "spawnWeight": 1.0, "effect": "one-time sprint boost without the noise penalty" },
+    { "id": "spare-badge", "displayName": "Spare badge", "spawnWeight": 0.8, "effect": "a second, weaker disguise charge" },
+    { "id": "map-fragment", "displayName": "Map fragment", "spawnWeight": 1.2, "effect": "labels every room role + badge door in one wing", "placementRule": "revealed wing biased away from spawn wing (Phase 12)" },
+    { "id": "maintenance-schematic", "displayName": "Maintenance schematic", "spawnWeight": 0.3, "effect": "labels every room role, door type, and sabotage fixture facility-wide", "placementRule": "never spawns inside a room it would reveal as a vault; strongest item in the pool" },
+    { "id": "signal-sniffer", "displayName": "Signal sniffer", "spawnWeight": 0.8, "effect": "pins the nearest two Warden-placed sensors to the blueprint", "note": "the only found item that reveals deployment rather than architecture" },
+    { "id": "radio-spoofer", "displayName": "Radio spoofer", "spawnWeight": 0.15, "charges": 1,
+      "constraints": {
+        "targetMustBeKnownGuardId": true,
+        "rangeRule": "target within radio-scanner range",
+        "transmitSeconds": 4,
+        "transmitStationary": true,
+        "transmitCancellable": false,
+        "scannerDeafWhileTransmitting": true,
+        "orderTtlSeconds": 30,
+        "alwaysTransient": true,
+        "consumedEvenIfQueried": true,
+        "originPing": "delayed zone-level ping on Facility Deployment — guaranteed, unblockable"
+      },
+      "placementRule": "rarest entry; never placed in the same round as a Maintenance schematic (Phase 12)" },
+    { "id": "body-drag-glove", "displayName": "Body-drag glove", "spawnWeight": 0.9, "effect": "downed guards can be dragged out of sightlines" },
+    { "id": "spoofed-id-chip", "displayName": "Spoofed ID chip", "spawnWeight": 0.6, "effect": "longer-duration Ghost pass at the cost of a full slot" },
+    { "id": "backup-tranq-dart", "displayName": "Backup tranq dart", "spawnWeight": 1.0, "effect": "+1 tranquilizer shot, stacks with base loadout" }
+  ],
+
+  "spawnRules": {
+    "spawnedPerRound": { "min": 4, "max": 6 },
+    "spreadConstraint": "never all in one wing; never all on the shortest entrance-to-vault path"
+  }
+}

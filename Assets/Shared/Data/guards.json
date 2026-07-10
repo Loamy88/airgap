@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "description": "Guard class definition: movement, perception, alertness ladder, takedown/consciousness, and the personality set. Reference data for Phases 2/4/5 — not runtime-loaded yet. All numbers are Phase 17 tuning surfaces unless noted.",
+
+  "movement": {
+    "patrolSpeed": 2.2,
+    "investigateSpeed": 2.8,
+    "chaseSpeed": 4.6
+  },
+
+  "vision": {
+    "range": 9.0,
+    "coneAngleDegrees": 70,
+    "visibilityCategories": ["none", "silhouette", "partial", "clear"],
+    "lightLevelFalloff": {
+      "description": "Multiplier on effective vision range per target light level. Shadow keeps the Infiltrator near-invisible at distance.",
+      "shadow": 0.25,
+      "dim": 0.6,
+      "lit": 1.0
+    },
+    "closeRangeCaptureDistance": 1.2,
+    "closeRangeCaptureRule": "A guard with visibility 'clear' on the Infiltrator inside closeRangeCaptureDistance captures immediately at any alertness ladder rung. No reaction window."
+  },
+
+  "hearing": {
+    "model": "probabilistic",
+    "rule": "Per sound event, per guard: P(notice) = clamp01(loudness * falloff(distance) * alertnessMultiplier). Every event rolls independently; failed rolls are not remembered. Machines (sensors/microphones) never roll — deterministic coverage.",
+    "falloff": {
+      "type": "inverseSquare",
+      "referenceDistance": 4.0,
+      "minProbabilityFloor": 0.01,
+      "floorNote": "Nowhere is zero — no distance where a loud noise is safe (see DEVELOPMENT.md Phase 2)."
+    },
+    "alertnessMultipliers": {
+      "relaxed": 0.6,
+      "standard": 1.0,
+      "heightened": 1.6
+    }
+  },
+
+  "alertnessLadder": {
+    "states": ["unaware", "suspicious", "searching", "alarmed"],
+    "reportKeyUpDelaySeconds": { "min": 0.5, "max": 1.5 },
+    "alarmedRule": "Alarmed guards accept no orders and auto-engage/capture on reaching the Infiltrator."
+  },
+
+  "memory": {
+    "bufferSeconds": 60,
+    "entryFields": ["eventType", "position", "timestamp", "confidence"],
+    "note": "Rolling per-guard log of personally perceived sight/sound events. Input to report generation (Phases 6-8)."
+  },
+
+  "consciousness": {
+    "states": ["active", "down"],
+    "downDurationSeconds": 30,
+    "wakeUpReport": true,
+    "wakeUpReportTag": "recovering-from-attack",
+    "noAutomaticDisclosure": "Going Down pushes no event to the Warden; only a status check or the wake-up report reveals it."
+  },
+
+  "badge": {
+    "carriesBadge": true,
+    "lootableWhenDown": true,
+    "flagTrigger": "Unresponsive confirmed (status check or wake-up report) AND badge missing -> badge ID flagged facility-wide."
+  },
+
+  "orders": {
+    "types": ["GuardPoint", "Patrol", "SetAlertness", "Investigate", "HoldPosition", "Disregard", "SayAgain", "WhosNearYou"],
+    "standingOrderTypes": ["GuardPoint", "Patrol", "SetAlertness"],
+    "transientOrderTypes": ["Investigate", "HoldPosition", "Disregard", "SayAgain", "WhosNearYou"],
+    "transientDefaultTtlSeconds": 30,
+    "deploymentExecutionLatencySeconds": 3,
+    "debounceSeconds": 5
+  },
+
+  "personalities": [
+    {
+      "id": "nervous",
+      "displayName": "Nervous",
+      "reportEagerness": 1.5,
+      "falseReportRate": 0.5,
+      "queryTone": "demands-confirmation",
+      "note": "Over-reports; half their sightings are nothing. Changes how they talk, never what they perceive or whether they obey."
+    },
+    {
+      "id": "bored",
+      "displayName": "Bored",
+      "reportEagerness": 0.6,
+      "falseReportRate": 0.05,
+      "queryTone": "grumbles",
+      "note": "Under-reports; when they key up, it's real."
+    },
+    {
+      "id": "professional",
+      "displayName": "Professional",
+      "reportEagerness": 1.0,
+      "falseReportRate": 0.15,
+      "queryTone": "terse",
+      "note": "Baseline disposition."
+    },
+    {
+      "id": "chatty",
+      "displayName": "Chatty",
+      "reportEagerness": 1.2,
+      "falseReportRate": 0.25,
+      "queryTone": "rambles",
+      "note": "Long reports, middling reliability — costs the Warden reading time."
+    }
+  ],
+
+  "idFormat": {
+    "pattern": "G-{number:00}",
+    "example": "G-04",
+    "rule": "Persistent unique display ID per guard, survives duty/alertness reassignment (Phase 4)."
+  }
+}

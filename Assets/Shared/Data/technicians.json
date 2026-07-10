@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "description": "Technician class definition (Phase 13). Deliberately lower-fidelity than guards: no weapon, no radio-report-on-sight, no alertness ladder. Reference data — not runtime-loaded yet.",
+
+  "movement": {
+    "workSpeed": 2.0,
+    "fleeSpeed": 5.2,
+    "fleeSpeedRule": "Must exceed Infiltrator sprint (see facility.json infiltrator.moveSpeeds.sprint) — once fleeing, only a tranq dart stops one."
+  },
+
+  "flee": {
+    "triggerOn": "line-of-sight on Infiltrator",
+    "calmDownSecondsWithoutResight": 20,
+    "abandonJobAfterFleeCount": 3,
+    "abandonBehavior": "Return to base and explicitly report the abandonment; fixture stays broken until a replacement is dispatched."
+  },
+
+  "repair": {
+    "defaultRepairSeconds": 12,
+    "dispatchModel": "Warden clicks a broken fixture from the dispatch panel; no live position feed, only 'in the field'."
+  },
+
+  "reporting": {
+    "liveReports": false,
+    "delayedReport": {
+      "enabled": true,
+      "firesWhen": "fled Technician reaches safety or resumes task",
+      "payload": ["lastSeenPosition", "secondsSinceSeen"]
+    }
+  },
+
+  "takedown": {
+    "permanent": true,
+    "wakesUp": false,
+    "generatesReport": false,
+    "note": "Removed from the available pool silently — a pure drain on Warden repair capacity."
+  },
+
+  "badge": {
+    "carriesBadge": true,
+    "canOpenBadgeDoors": true,
+    "wakeReportPath": false,
+    "flagExposure": "Only the plausibility check (door location vs. last dispatch destination) can expose a looted Technician badge — and a mismatch points near-exactly at the Infiltrator."
+  },
+
+  "pool": {
+    "availablePerRound": 3
+  }
+}

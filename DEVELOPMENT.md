@@ -20,30 +20,34 @@ This project is meant to be built mostly by Claude Code rather than by hand, so 
 - **Hybrid workflow:** Claude Code writes all scripts and data; you open the editor only to (a) wire scenes together from pre-made prefabs, (b) hit Play to test feel, or (c) adjust balance numbers. No hand-crafting level layouts or scripting from the editor.
 - **Flag-for-human items:** feel and balance tuning (Phase 17), and any "does this read as fun/tense" judgment call. Everything else — state machines, data schemas, UI wiring, procedural algorithms, validation — is fair game to drive end-to-end with Claude Code via command line.
 
+## Dev Note to Claude
+
+- **Current Development Structure:** To ask for assistance or show a demo for confirmation while working, inform the user via Claude Comms. Stop at the end of each Phase.
+
 ## Phase 0 — Foundations & Tooling
 
 ### Part A: Unity Project Setup
-- [ ] **CLI validation:** verify `Unity -version` returns a 2022 LTS or later version available in PATH.
-- [ ] **Create new 2D URP project:** `Unity -createProject -quit -batchmode` with 2D template and URP enabled (stores project path in `.env` for later scripting).
-- [ ] **Repo structure:** create `Assets/{Infiltrator,Warden,Facility,Shared}` folders and initial `.gitignore` (Unity-standard, excludes Library/Logs/Temp/Obj/Build).
-- [ ] **ProjectSettings:** configure URP asset (already default in 2D template), confirm `Light2D` support enabled in URP settings.
+- [x] **CLI validation:** verify `Unity -version` returns a 2022 LTS or later version available in PATH. *(6000.5.3f1)*
+- [x] **Create new 2D URP project:** seeded at the repo root from the editor's installed 2D URP template tarball (same data Unity Hub copies) rather than `-createProject`, which can't take a template — gets verified package versions and the URP 2D assets for free. Machine paths in `.env`.
+- [x] **Repo structure:** create `Assets/{Infiltrator,Warden,Facility,Shared}` folders and initial `.gitignore` (Unity-standard, excludes Library/Logs/Temp/Obj/Build).
+- [x] **ProjectSettings:** configure URP asset (already default in 2D template), confirm `Light2D` support enabled in URP settings. *(Quality levels → `UniversalRP.asset` → `Renderer2D.asset`, the Light2D-capable 2D renderer.)*
 
 ### Part B: Data & Scripting Infrastructure
-- [ ] **Data schemas:** author JSON definitions for guards, technicians, gadgets, facility config (placed in `Assets/Shared` as reference, not runtime-loaded yet).
-- [ ] **Scripting conventions:** establish namespace structure (`AIRGAP.Infiltrator`, `AIRGAP.Warden`, `AIRGAP.Facility`, `AIRGAP.Shared`), code layout, and serialization patterns.
-- [ ] **Validation harness:** create a C# console validator (can run in `-batchmode`) that checks data schema integrity — validates guard/gadget definitions, facility config sanity, and reports errors to stdout for CI.
-- [ ] **Build test:** ensure the empty project compiles via `Unity -buildWindows64Player` (even if no game logic yet).
+- [x] **Data schemas:** author JSON definitions for guards, technicians, gadgets, facility config (placed in `Assets/Shared/Data` as reference, not runtime-loaded yet).
+- [x] **Scripting conventions:** establish namespace structure (`AIRGAP.Infiltrator`, `AIRGAP.Warden`, `AIRGAP.Facility`, `AIRGAP.Shared`), code layout, and serialization patterns. *(docs/CONVENTIONS.md)*
+- [x] **Validation harness:** create a C# console validator (can run in `-batchmode`) that checks data schema integrity — validates guard/gadget definitions, facility config sanity, and reports errors to stdout for CI. *(`AIRGAP.CI.ValidatePhase0.Run`)*
+- [x] **Build test:** ensure the empty project compiles via CLI player build. *(`AIRGAP.CI.Build.WindowsPlayer` → `Builds/Windows/Airgap.exe`)*
 
 ### Part C: Input & Control Definitions
-- [ ] **Input Manager config:** define gamepad/keyboard axes for Infiltrator (move, sprint, aim) and Warden (screen-switch, click). Store in InputManager.asset.
-- [ ] **Control schema file:** create a document (markdown or JSON) listing all input bindings for future reference.
+- [x] **Input config:** define gamepad/keyboard bindings for Infiltrator (move, sprint, aim) and Warden (screen-switch, click). *(Deviation: authored as new Input System action maps in `Assets/Settings/AirgapControls.inputactions` — the Unity 6 template default, and JSON-as-data fits the project's data-driven rule better than InputManager.asset. Active input handling set to Both so legacy polling still works while greyboxing.)*
+- [x] **Control schema file:** create a document (markdown or JSON) listing all input bindings for future reference. *(docs/CONTROLS.md)*
 
 ### Part D: Basic Networking Scaffold
 Two devices, always — no split-screen, no shared-machine mode (see Networking, in README.md, for why). This means a minimal network layer has to exist from Phase 0, not get retrofitted after the fact.
-- [ ] **Install Netcode for GameObjects (NGO)** package.
-- [ ] **One universal build, role chosen at connect time** — rather than shipping separate Infiltrator/Warden executables, a single build presents a host-or-join screen and a role pick, simplifying distribution to one artifact.
-- [ ] **LAN direct-connect for dev-time:** basic `NetworkManager` setup using IP-based direct connect — no Relay/Lobby yet, just enough to prove two processes can talk. This is the foundation Phase 16 upgrades to Relay/Lobby later.
-- [ ] **Smoke test:** two separate processes (two Editor instances on one dev machine for early testing, or two actual devices on the same LAN) connect, each resolves into the correct role, and a trivial synced value (a ping RPC) round-trips. Every later phase builds on this connection existing.
+- [x] **Install Netcode for GameObjects (NGO)** package. *(2.13.0, installed CLI-side via `AIRGAP.CI.PackageBootstrap.InstallNetcode`)*
+- [x] **One universal build, role chosen at connect time** — rather than shipping separate Infiltrator/Warden executables, a single build presents a host-or-join screen and a role pick, simplifying distribution to one artifact. *(`ConnectionBootstrap` IMGUI screen; host keeps its picked role, joiner resolves to the complement.)*
+- [x] **LAN direct-connect for dev-time:** basic `NetworkManager` setup using IP-based direct connect — no Relay/Lobby yet, just enough to prove two processes can talk. This is the foundation Phase 16 upgrades to Relay/Lobby later. *(Bootstrap scene generated by `AIRGAP.CI.SceneBootstrap.CreateBootstrapScene`.)*
+- [x] **Smoke test:** two separate processes (two Editor instances on one dev machine for early testing, or two actual devices on the same LAN) connect, each resolves into the correct role, and a trivial synced value (a ping RPC) round-trips. Every later phase builds on this connection existing. *(`tools/smoke-test.ps1`: two headless player processes over loopback UDP — PASS, host=Infiltrator, client=Warden, ping round-tripped.)*
 
 ## Phase 1 — Grey-box Movement Prototype
 Single test room, no AI yet — just prove movement and stealth *feel* before adding anything reactive to it. Claude Code generates all scripts; you create one test scene in the editor and hit Play to validate feel.
