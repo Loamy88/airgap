@@ -1,10 +1,14 @@
 using System.IO;
 using AIRGAP.Facility;
+using AIRGAP.Facility.Guards;
+using AIRGAP.Facility.Lighting;
 using AIRGAP.Infiltrator;
+using AIRGAP.Shared.Data;
 using AIRGAP.Shared.Greybox;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace AIRGAP.CI
 {
@@ -118,8 +122,17 @@ namespace AIRGAP.CI
             line.sortingOrder = 10;
             var ring = ringGo.AddComponent<NoiseRing>();
 
+            // Flashlight: gameplay cone (AirgapLight) + visual twin (Light2D), config
+            // from gadgets.json. Inactive by default — the controller toggles the GO.
+            FlashlightConfig flashlightConfig = GameConfig.Load().Flashlight;
             var flashlightGo = new GameObject("Flashlight");
             flashlightGo.transform.SetParent(player.transform, false);
+            var beam = flashlightGo.AddComponent<AirgapLight>();
+            beam.Configure(flashlightConfig.BeamIntensity, flashlightConfig.BeamRange,
+                flashlightConfig.BeamAngleDegrees, flashlightConfig.SelfGlowLevel,
+                flashlightConfig.SelfGlowRadius, true);
+            AddLight2D(flashlightGo.transform, flashlightConfig.BeamRange,
+                flashlightConfig.BeamAngleDegrees, new Color(1f, 0.95f, 0.8f), 1.2f);
 
             var controller = player.AddComponent<InfiltratorController>();
             controller.SetNoiseRing(ring);
@@ -136,6 +149,18 @@ namespace AIRGAP.CI
             collider.size = new Vector2(0.9f, 0.9f);
             guard.AddComponent<GuardMarker>().SetGuardId("G-01");
             Visual(guard.transform, "Body", new Vector2(0.9f, 0.9f), new Color(0.3f, 0.5f, 0.95f), 5);
+
+            // Phase 2 perception: vision cone (with debug fan) + probabilistic hearing.
+            var coneGo = new GameObject("VisionCone");
+            coneGo.transform.SetParent(guard.transform, false);
+            var coneLine = coneGo.AddComponent<LineRenderer>();
+            coneLine.material = _unlit;
+            coneLine.useWorldSpace = false;
+            coneLine.loop = true;
+            coneLine.startWidth = coneLine.endWidth = 0.04f;
+            coneLine.sortingOrder = 9;
+            guard.AddComponent<GuardVision>().SetConeRenderer(coneLine);
+            guard.AddComponent<GuardHearing>();
         }
 
         private static void BuildCameraAndHud(Transform player)
@@ -152,11 +177,66 @@ namespace AIRGAP.CI
             new GameObject("Debug HUD").AddComponent<GreyboxHud>();
         }
 
-        // ---- lights (populated in Phase 2) ---------------------------------
+        // ---- lights ---------------------------------------------------------
+        // Night baseline + authored sources (lamp, window spill, floodlight,
+        // monitor glow). Each is an AirgapLight (gameplay) + Light2D (visual).
 
         private static void BuildLights(GameObject player)
         {
-            // Phase 2 adds the night baseline and authored light sources here.
+            var globalGo = new GameObject("Light_GlobalNight");
+            var global = globalGo.AddComponent<Light2D>();
+            global.lightType = Light2D.LightType.Global;
+            global.intensity = 0.14f;
+            global.color = new Color(0.55f, 0.6f, 0.9f);
+
+            LightSource("Light_Lamp_RoomA", new Vector2(-5f, 2f), 0.9f, 5f, 0f, Vector2.right,
+                new Color(1f, 0.88f, 0.65f), 1.0f);
+            LightSource("Light_WindowSpill", new Vector2(-10.6f, -1f), 0.5f, 6f, 55f, Vector2.right,
+                new Color(0.6f, 0.7f, 1f), 0.7f);
+            LightSource("Light_Floodlight", new Vector2(7f, 5.9f), 0.85f, 5.5f, 60f, Vector2.down,
+                new Color(0.95f, 0.95f, 1f), 1.1f);
+            LightSource("Light_MonitorGlow", new Vector2(8f, -3f), 0.55f, 3f, 0f, Vector2.right,
+                new Color(0.4f, 0.85f, 1f), 0.8f);
+        }
+
+        private static void LightSource(string name, Vector2 position, float gameIntensity,
+            float range, float coneDegrees, Vector2 facing, Color color, float visualIntensity)
+        {
+            var go = new GameObject(name);
+            go.transform.position = position;
+            if (coneDegrees > 0f) go.transform.right = facing;
+
+            var light = go.AddComponent<AirgapLight>();
+            light.Configure(gameIntensity, range, coneDegrees, 0f, 0f, true);
+            AddLight2D(go.transform, range, coneDegrees, color, visualIntensity);
+        }
+
+        /// <summary>
+        /// Visual twin on a child rotated so the Light2D spot axis (+Y) lines up
+        /// with the gameplay cone axis (+X of the parent).
+        /// </summary>
+        private static void AddLight2D(Transform parent, float range, float coneDegrees,
+            Color color, float intensity)
+        {
+            var go = new GameObject("Light2D");
+            go.transform.SetParent(parent, false);
+            go.transform.localRotation = Quaternion.Euler(0f, 0f, -90f);
+            var light = go.AddComponent<Light2D>();
+            light.lightType = Light2D.LightType.Point;
+            light.pointLightInnerRadius = 0.1f;
+            light.pointLightOuterRadius = range;
+            light.color = color;
+            light.intensity = intensity;
+            if (coneDegrees > 0f)
+            {
+                light.pointLightInnerAngle = coneDegrees * 0.7f;
+                light.pointLightOuterAngle = coneDegrees;
+            }
+            else
+            {
+                light.pointLightInnerAngle = 360f;
+                light.pointLightOuterAngle = 360f;
+            }
         }
 
         // ---- helpers -------------------------------------------------------
