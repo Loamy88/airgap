@@ -24,7 +24,7 @@ namespace AIRGAP.CI
         public static void Run()
         {
             Errors.Clear();
-            SimulationMode2D previousMode = Physics2D.simulationMode;
+            bool passed = false;
             try
             {
                 EditorSceneManager.OpenScene(GreyboxScene.ScenePath, OpenSceneMode.Single);
@@ -36,8 +36,7 @@ namespace AIRGAP.CI
                 var player = Object.FindFirstObjectByType<InfiltratorController>();
                 if (player == null)
                 {
-                    Fail("no InfiltratorController in scene");
-                    return;
+                    throw new System.Exception("no InfiltratorController in scene");
                 }
 
                 var body = player.GetComponent<Rigidbody2D>();
@@ -105,18 +104,26 @@ namespace AIRGAP.CI
                     $"crouch latch persists after vent exit (got {player.Stance.Current})");
                 Check(body.position.y < 3.6f, $"descended into room B (y={body.position.y:F2})");
 
-                Report("ValidatePhase1");
+                passed = LogReport("ValidatePhase1");
             }
             catch (System.Exception e)
             {
                 Debug.LogError($"[AIRGAP.CI] ValidatePhase1 exception: {e}");
-                if (Application.isBatchMode) EditorApplication.Exit(1);
+                passed = false;
             }
             finally
             {
-                Physics2D.simulationMode = previousMode;
+                // Physics2D.simulationMode is a PERSISTED project setting, and Unity
+                // saves settings on shutdown — so it must be restored before the
+                // process exits, on every path. Exiting from inside the try block
+                // once leaked Script mode into Physics2DSettings.asset and froze
+                // play-mode physics for the human playtest. Restore to the engine
+                // default rather than the captured value so a previously leaked
+                // Script mode can't survive either.
+                Physics2D.simulationMode = SimulationMode2D.FixedUpdate;
                 SoundBus.Reset();
             }
+            if (Application.isBatchMode) EditorApplication.Exit(passed ? 0 : 1);
         }
 
         private static void Step(InfiltratorController player, float seconds)
@@ -142,21 +149,16 @@ namespace AIRGAP.CI
             else Errors.Add(description);
         }
 
-        private static void Fail(string description) => Errors.Add(description);
-
-        private static void Report(string name)
+        private static bool LogReport(string name)
         {
             if (Errors.Count == 0)
             {
                 Debug.Log($"[AIRGAP.CI] {name} PASS");
-                if (Application.isBatchMode) EditorApplication.Exit(0);
+                return true;
             }
-            else
-            {
-                foreach (string error in Errors) Debug.LogError($"[AIRGAP.CI] FAIL: {error}");
-                Debug.LogError($"[AIRGAP.CI] {name} FAIL — {Errors.Count} error(s)");
-                if (Application.isBatchMode) EditorApplication.Exit(1);
-            }
+            foreach (string error in Errors) Debug.LogError($"[AIRGAP.CI] FAIL: {error}");
+            Debug.LogError($"[AIRGAP.CI] {name} FAIL — {Errors.Count} error(s)");
+            return false;
         }
     }
 }

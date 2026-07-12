@@ -26,6 +26,7 @@ namespace AIRGAP.CI
         public static void Run()
         {
             Errors.Clear();
+            bool passed = false;
             try
             {
                 EditorSceneManager.OpenScene(GreyboxScene.ScenePath, OpenSceneMode.Single);
@@ -37,9 +38,7 @@ namespace AIRGAP.CI
                 var hearing = Object.FindFirstObjectByType<GuardHearing>();
                 if (player == null || vision == null || hearing == null)
                 {
-                    Errors.Add($"scene missing components (player={player}, vision={vision}, hearing={hearing})");
-                    Report();
-                    return;
+                    throw new System.Exception($"scene missing components (player={player}, vision={vision}, hearing={hearing})");
                 }
 
                 var input = new ScriptedMovementInput();
@@ -148,17 +147,20 @@ namespace AIRGAP.CI
                 Check(hearing.LastResult.HasValue && hearing.LastResult.Value.Sound.Type == "bus-wiring",
                     "SoundBus emission reaches guard hearing");
 
-                Report();
+                passed = LogReport();
             }
             catch (System.Exception e)
             {
                 Debug.LogError($"[AIRGAP.CI] ValidatePhase2 exception: {e}");
-                if (Application.isBatchMode) EditorApplication.Exit(1);
+                passed = false;
             }
             finally
             {
+                // Exit only after cleanup — never from inside try (see ValidatePhase1's
+                // simulationMode leak for why this pattern is load-bearing).
                 SoundBus.Reset();
             }
+            if (Application.isBatchMode) EditorApplication.Exit(passed ? 0 : 1);
         }
 
         private static void MovePlayer(InfiltratorController player, Vector2 position)
@@ -181,19 +183,16 @@ namespace AIRGAP.CI
             else Errors.Add(description);
         }
 
-        private static void Report()
+        private static bool LogReport()
         {
             if (Errors.Count == 0)
             {
                 Debug.Log("[AIRGAP.CI] ValidatePhase2 PASS");
-                if (Application.isBatchMode) EditorApplication.Exit(0);
+                return true;
             }
-            else
-            {
-                foreach (string error in Errors) Debug.LogError($"[AIRGAP.CI] FAIL: {error}");
-                Debug.LogError($"[AIRGAP.CI] ValidatePhase2 FAIL — {Errors.Count} error(s)");
-                if (Application.isBatchMode) EditorApplication.Exit(1);
-            }
+            foreach (string error in Errors) Debug.LogError($"[AIRGAP.CI] FAIL: {error}");
+            Debug.LogError($"[AIRGAP.CI] ValidatePhase2 FAIL — {Errors.Count} error(s)");
+            return false;
         }
     }
 }
