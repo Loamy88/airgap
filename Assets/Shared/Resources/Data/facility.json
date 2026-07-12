@@ -23,9 +23,19 @@
   "infiltrator": {
     "moveSpeeds": { "crouch": 1.4, "walk": 2.6, "sprint": 4.8 },
     "noiseLoudness": { "crouch": 0.1, "walk": 0.35, "sprint": 0.8 },
+    "traversal": { "speed": 1.2, "noiseLoudness": 0.15 },
+    "footstepIntervalSeconds": { "crouch": 0.55, "walk": 0.4, "sprint": 0.28 },
+    "noiseRingScale": 8.0,
     "noiseRadiusDebugColor": "green",
     "lightLevels": ["shadow", "dim", "lit"],
     "stanceNote": "Noise values feed the probabilistic hearing model in guards.json; radii are debug visualization only — hearing has no hard radius."
+  },
+
+  "lighting": {
+    "globalNightLevel": 0.06,
+    "dimThreshold": 0.15,
+    "litThreshold": 0.45,
+    "description": "Night baseline plus authored sources. Sampled light level maps to shadow (< dimThreshold), dim, or lit (>= litThreshold); the categories feed guard vision falloff (guards.json)."
   },
 
   "roomRoles": {

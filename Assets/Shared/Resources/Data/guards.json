@@ -18,6 +18,11 @@
       "dim": 0.6,
       "lit": 1.0
     },
+    "categoryDistanceFractions": {
+      "description": "Fractions of light-adjusted effective vision range: closer than clear -> clear, closer than partial -> partial, else silhouette.",
+      "clear": 0.35,
+      "partial": 0.7
+    },
     "closeRangeCaptureDistance": 1.2,
     "closeRangeCaptureRule": "A guard with visibility 'clear' on the Infiltrator inside closeRangeCaptureDistance captures immediately at any alertness ladder rung. No reaction window."
   },

@@ -20,7 +20,7 @@ namespace AIRGAP.CI
         public static void Run()
         {
             Errors.Clear();
-            string dataDir = Path.Combine(Application.dataPath, "Shared", "Data");
+            string dataDir = Path.Combine(Application.dataPath, "Shared", "Resources", "Data");
 
             JObject guards = LoadJson(Path.Combine(dataDir, "guards.json"));
             JObject technicians = LoadJson(Path.Combine(dataDir, "technicians.json"));
@@ -282,6 +282,23 @@ namespace AIRGAP.CI
             float nSprint = Require<float>(f, "infiltrator.noiseLoudness.sprint", file);
             if (!(0 <= nCrouch && nCrouch < nWalk && nWalk < nSprint && nSprint <= 1f))
                 Errors.Add($"{file}: infiltrator.noiseLoudness must be increasing within [0,1]");
+
+            float traversalSpeed = Require<float>(f, "infiltrator.traversal.speed", file);
+            if (traversalSpeed <= 0 || traversalSpeed > walk)
+                Errors.Add($"{file}: infiltrator.traversal.speed must be in (0, walk]");
+            float stepCrouch = Require<float>(f, "infiltrator.footstepIntervalSeconds.crouch", file);
+            float stepWalk = Require<float>(f, "infiltrator.footstepIntervalSeconds.walk", file);
+            float stepSprint = Require<float>(f, "infiltrator.footstepIntervalSeconds.sprint", file);
+            if (!(stepCrouch > stepWalk && stepWalk > stepSprint && stepSprint > 0))
+                Errors.Add($"{file}: footstep intervals must satisfy crouch > walk > sprint > 0");
+
+            float nightLevel = Require<float>(f, "lighting.globalNightLevel", file);
+            float dimThreshold = Require<float>(f, "lighting.dimThreshold", file);
+            float litThreshold = Require<float>(f, "lighting.litThreshold", file);
+            if (!(0 <= nightLevel && nightLevel < dimThreshold && dimThreshold < litThreshold && litThreshold <= 1f))
+                Errors.Add($"{file}: lighting must satisfy 0 <= globalNightLevel < dimThreshold < litThreshold <= 1");
+            if (nightLevel >= dimThreshold)
+                Errors.Add($"{file}: the night baseline must read as shadow — globalNightLevel must sit below dimThreshold");
 
             int vaultEligible = Require<int>(f, "roomRoles.recipe.vault.eligibleSlots", file);
             int vaultChosen = Require<int>(f, "roomRoles.recipe.vault.chosen", file);

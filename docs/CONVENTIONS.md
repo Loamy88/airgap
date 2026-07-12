@@ -52,6 +52,9 @@ Unity -batchmode -nographics -projectPath . -executeMethod AIRGAP.CI.<Class>.<Me
   - `AIRGAP.CI.ValidatePhase0.Run` — data-schema integrity checks
   - `AIRGAP.CI.SceneBootstrap.CreateBootstrapScene` — (re)generate the network bootstrap scene + player prefab
   - `AIRGAP.CI.Build.WindowsPlayer` — headless Windows 64-bit player build to `Builds/Windows/`
+  - `AIRGAP.CI.GreyboxScene.Create` — (re)generate the Phase 1/2 grey-box test scene (`Assets/Scenes/Greybox.unity`)
+  - `AIRGAP.CI.ValidatePhase1.Run` — scripted movement sequence: stances, speeds, footsteps, vent traversal
+- Headless simulation pattern: gameplay components expose `EnsureInitialized()` + `Tick(dt)`; validators set `Physics2D.simulationMode = Script`, drive ticks, and step `Physics2D.Simulate` themselves. World state queries are poll-based (no trigger callbacks) so play mode and batchmode behave identically.
 - Machine-local paths (editor path, project path) live in `.env` (gitignored); see `.env` on this machine.
 
 ## Git

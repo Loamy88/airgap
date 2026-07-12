@@ -18,6 +18,9 @@
       "toggleable": true,
       "beamAngleDegrees": 35,
       "beamRange": 6.0,
+      "beamIntensity": 0.85,
+      "selfGlowLevel": 0.45,
+      "selfGlowRadius": 1.5,
       "selfLightLevelWhenOn": "lit",
       "note": "Feeds the same visibility sampling as every other light source — raises the carrier's own light level. Off by default."
     },
