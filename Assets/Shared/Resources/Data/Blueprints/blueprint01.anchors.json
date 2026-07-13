@@ -1,0 +1,444 @@
+{
+  "schemaVersion": 1,
+  "description": "Blueprint 01 anchor data: item hiding spots, light sources, sensor mounts, sabotage fixture mounts. Data space is x-right y-down, units = tiles. All anchors sit >= 1.2 tiles from every rect edge of their space (guarantees >= 1 tile from any wall-mounted door).",
+  "blueprint": "bp01",
+  "spaces": {
+    "R01": {
+      "itemAnchors": [
+        { "id": "R01-IA1", "x": 2.5, "y": 27.5, "note": "behind the pallet stack in the southwest corner" },
+        { "id": "R01-IA2", "x": 11, "y": 19.5, "note": "inside the empty crate by the dock office" },
+        { "id": "R01-IA3", "x": 7, "y": 23, "note": "under the conveyor rollers" }
+      ],
+      "lightSources": [
+        { "id": "R01-L1", "x": 4, "y": 20, "kind": "highbay", "range": 6, "intensity": 0.6, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R01-L2", "x": 10, "y": 26, "kind": "highbay", "range": 6, "intensity": 0.55, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R01-SM1", "x": 2, "y": 18.5, "note": "covers the vent grate in the northwest corner" },
+        { "id": "R01-SM2", "x": 7, "y": 28.5, "note": "watches the dock floor from the south wall" }
+      ]
+    },
+    "R02": {
+      "itemAnchors": [
+        { "id": "R02-IA1", "x": 5, "y": 10.5, "note": "taped under the front desk" }
+      ],
+      "lightSources": [
+        { "id": "R02-L1", "x": 6.5, "y": 11.5, "kind": "lamp", "range": 4, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R02-L2", "x": 1.5, "y": 10.5, "kind": "window-spill", "range": 5, "intensity": 0.4, "coneDeg": 55, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R02-SM1", "x": 2, "y": 9.5, "note": "front-door interior, above the visitor sign-in" }
+      ]
+    },
+    "R03": {
+      "itemAnchors": [
+        { "id": "R03-IA1", "x": 12, "y": 2, "note": "bottom drawer of the corner desk" },
+        { "id": "R03-IA2", "x": 17.5, "y": 6, "note": "behind the copier" }
+      ],
+      "lightSources": [
+        { "id": "R03-L1", "x": 13, "y": 3, "kind": "desk", "range": 3, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R03-L2", "x": 17, "y": 5, "kind": "lamp", "range": 3.5, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R04": {
+      "itemAnchors": [
+        { "id": "R04-IA1", "x": 20, "y": 10, "note": "top shelf of the west stacks" },
+        { "id": "R04-IA2", "x": 24, "y": 12, "note": "inside a mislabelled archive box" }
+      ],
+      "lightSources": [
+        { "id": "R04-L1", "x": 21, "y": 12, "kind": "lamp", "range": 3.5, "intensity": 0.35, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R05": {
+      "itemAnchors": [
+        { "id": "R05-IA1", "x": 22, "y": 2, "note": "back of the fridge" },
+        { "id": "R05-IA2", "x": 24, "y": 6, "note": "under the vending machine" }
+      ],
+      "lightSources": [
+        { "id": "R05-L1", "x": 23, "y": 4, "kind": "lamp", "range": 4, "intensity": 0.45, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R16": {
+      "itemAnchors": [
+        { "id": "R16-IA1", "x": 28, "y": 2, "note": "in the dead-letter bin" },
+        { "id": "R16-IA2", "x": 32, "y": 7.5, "note": "under the sorting table" }
+      ],
+      "lightSources": [
+        { "id": "R16-L1", "x": 30, "y": 4, "kind": "highbay", "range": 5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R07": {
+      "itemAnchors": [
+        { "id": "R07-IA1", "x": 36, "y": 2, "note": "behind rack row B-1" },
+        { "id": "R07-IA2", "x": 44, "y": 3, "note": "in the cable tray above rack B-7" },
+        { "id": "R07-IA3", "x": 40, "y": 8, "note": "under a raised floor tile, south aisle" }
+      ],
+      "lightSources": [
+        { "id": "R07-L1", "x": 38, "y": 5, "kind": "highbay", "range": 5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R07-L2", "x": 43, "y": 7, "kind": "monitor", "range": 3, "intensity": 0.3, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R14": {
+      "itemAnchors": [
+        { "id": "R14-IA1", "x": 48, "y": 2, "note": "behind the framed award on the credenza" },
+        { "id": "R14-IA2", "x": 55, "y": 5.5, "note": "false bottom of the executive desk drawer" }
+      ],
+      "lightSources": [
+        { "id": "R14-L1", "x": 54, "y": 4, "kind": "desk", "range": 3, "intensity": 0.45, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R14-L2", "x": 48, "y": 5, "kind": "lamp", "range": 4, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R19": {
+      "itemAnchors": [
+        { "id": "R19-IA1", "x": 53, "y": 10, "note": "inside the umbrella stand" }
+      ],
+      "lightSources": [
+        { "id": "R19-L1", "x": 54.5, "y": 10, "kind": "lamp", "range": 3.5, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R19-SM1", "x": 50.5, "y": 9.5, "note": "anteroom interior, sweeping the executive door" }
+      ]
+    },
+    "R22": {
+      "itemAnchors": [
+        { "id": "R22-IA1", "x": 60, "y": 2, "note": "under the bottom stair riser" }
+      ],
+      "lightSources": [
+        { "id": "R22-L1", "x": 60, "y": 7, "kind": "emergency", "range": 3, "intensity": 0.35, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R22-SM1", "x": 60, "y": 10, "note": "stairwell mid-landing, covers the roof-hatch drop" }
+      ]
+    },
+    "R17": {
+      "itemAnchors": [
+        { "id": "R17-IA1", "x": 64, "y": 8, "note": "behind the shell-office partition" },
+        { "id": "R17-IA2", "x": 71, "y": 14.5, "note": "in the unplugged mini-fridge" }
+      ],
+      "lightSources": [
+        { "id": "R17-L1", "x": 66, "y": 9, "kind": "desk", "range": 3, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R17-L2", "x": 72.5, "y": 12, "kind": "window-spill", "range": 5, "intensity": 0.35, "coneDeg": 50, "facingDeg": 180 }
+      ]
+    },
+    "R11": {
+      "itemAnchors": [
+        { "id": "R11-IA1", "x": 19, "y": 19, "note": "top shelf, west racking" },
+        { "id": "R11-IA2", "x": 21, "y": 20.5, "note": "inside a sealed shipping tote" },
+        { "id": "R11-IA3", "x": 23, "y": 22.5, "note": "inside the spool of cable" }
+      ],
+      "lightSources": [
+        { "id": "R11-L1", "x": 20, "y": 21, "kind": "emergency", "range": 3, "intensity": 0.3, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R26": {
+      "itemAnchors": [
+        { "id": "R26-IA1", "x": 27, "y": 19.5, "note": "beneath the boot bench" }
+      ],
+      "lightSources": [
+        { "id": "R26-L1", "x": 29, "y": 19.5, "kind": "lamp", "range": 3.5, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R26-SM1", "x": 26.5, "y": 18.5, "note": "anteroom interior, facing the core doorway" }
+      ],
+      "sabotageFixtureMounts": [
+        { "id": "R26-SB1", "x": 31, "y": 20, "kind": "sensor-relay" }
+      ]
+    },
+    "R10": {
+      "itemAnchors": [
+        { "id": "R10-IA1", "x": 35, "y": 19, "note": "behind the core cooling shroud" },
+        { "id": "R10-IA2", "x": 39, "y": 22.5, "note": "under the operator console" }
+      ],
+      "lightSources": [
+        { "id": "R10-L1", "x": 37, "y": 20.5, "kind": "monitor", "range": 3.5, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R10-L2", "x": 35, "y": 22, "kind": "desk", "range": 3, "intensity": 0.35, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R10-SM1", "x": 37, "y": 18.5, "note": "north wall of the core, sweeping the single doorway" }
+      ]
+    },
+    "R28": {
+      "itemAnchors": [
+        { "id": "R28-IA1", "x": 43, "y": 19, "note": "inside the faraday cage" },
+        { "id": "R28-IA2", "x": 48.5, "y": 19.5, "note": "under the test bench" }
+      ],
+      "lightSources": [
+        { "id": "R28-L1", "x": 44, "y": 19.5, "kind": "desk", "range": 3, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R28-L2", "x": 48, "y": 19, "kind": "monitor", "range": 3, "intensity": 0.35, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R09": {
+      "itemAnchors": [
+        { "id": "R09-IA1", "x": 53, "y": 19, "note": "behind the breaker cabinet" }
+      ],
+      "lightSources": [
+        { "id": "R09-L1", "x": 54, "y": 19.5, "kind": "lamp", "range": 3.5, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R24": {
+      "itemAnchors": [
+        { "id": "R24-IA1", "x": 19, "y": 26, "note": "in the bottom of the mop bucket" },
+        { "id": "R24-IA2", "x": 23, "y": 28, "note": "top shelf, behind the paint cans" }
+      ],
+      "lightSources": [
+        { "id": "R24-L1", "x": 21, "y": 26, "kind": "emergency", "range": 3, "intensity": 0.3, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sabotageFixtureMounts": [
+        { "id": "R24-SB1", "x": 21, "y": 27, "kind": "zone-breaker" }
+      ]
+    },
+    "R27": {
+      "itemAnchors": [
+        { "id": "R27-IA1", "x": 27, "y": 24, "note": "beneath the raised monitor dais" },
+        { "id": "R27-IA2", "x": 31, "y": 28, "note": "in the tape backup cabinet" }
+      ],
+      "lightSources": [
+        { "id": "R27-L1", "x": 26.5, "y": 23.5, "kind": "emergency", "range": 3, "intensity": 0.3, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R23": {
+      "itemAnchors": [
+        { "id": "R23-IA1", "x": 35, "y": 26, "note": "inside cage locker 3" },
+        { "id": "R23-IA2", "x": 39, "y": 28, "note": "under the loose cage panel" }
+      ]
+    },
+    "R13": {
+      "itemAnchors": [
+        { "id": "R13-IA1", "x": 43, "y": 24, "note": "behind rack row R-1" },
+        { "id": "R13-IA2", "x": 46, "y": 26, "note": "under the raised floor, centre aisle" },
+        { "id": "R13-IA3", "x": 49, "y": 28, "note": "in the decommissioned rack chassis" }
+      ],
+      "lightSources": [
+        { "id": "R13-L1", "x": 45, "y": 25, "kind": "monitor", "range": 3, "intensity": 0.3, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R29": {
+      "itemAnchors": [
+        { "id": "R29-IA1", "x": 53, "y": 25, "note": "behind the generator day-tank" },
+        { "id": "R29-IA2", "x": 57, "y": 28, "note": "in the spare-parts crate" }
+      ],
+      "lightSources": [
+        { "id": "R29-L1", "x": 55, "y": 26, "kind": "lamp", "range": 4, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R29-L2", "x": 57, "y": 25, "kind": "emergency", "range": 3, "intensity": 0.3, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R12": {
+      "itemAnchors": [
+        { "id": "R12-IA1", "x": 64, "y": 19, "note": "under the workbench" },
+        { "id": "R12-IA2", "x": 72, "y": 21, "note": "in the tool chest, bottom tray" },
+        { "id": "R12-IA3", "x": 68, "y": 27, "note": "behind the parts shelving" }
+      ],
+      "lightSources": [
+        { "id": "R12-L1", "x": 66, "y": 20, "kind": "highbay", "range": 5, "intensity": 0.55, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R12-L2", "x": 70, "y": 27, "kind": "lamp", "range": 4, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R12-SM1", "x": 72.5, "y": 24, "note": "east wall interior, covering the exterior door" }
+      ],
+      "sabotageFixtureMounts": [
+        { "id": "R12-SB1", "x": 69, "y": 19, "kind": "sensor-relay" }
+      ]
+    },
+    "R31": {
+      "itemAnchors": [
+        { "id": "R31-IA1", "x": 64, "y": 32, "note": "inside the crate marked SCRAP" },
+        { "id": "R31-IA2", "x": 67, "y": 37, "note": "under a tarpaulin" },
+        { "id": "R31-IA3", "x": 72, "y": 41, "note": "behind the pallet racking, far corner" }
+      ],
+      "lightSources": [
+        { "id": "R31-L1", "x": 67, "y": 36, "kind": "highbay", "range": 5, "intensity": 0.45, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R31-SM1", "x": 65, "y": 41.5, "note": "south end, covering the vent grate area" }
+      ],
+      "sabotageFixtureMounts": [
+        { "id": "R31-SB1", "x": 70, "y": 33, "kind": "zone-breaker" }
+      ]
+    },
+    "R30": {
+      "itemAnchors": [
+        { "id": "R30-IA1", "x": 2, "y": 31.5, "note": "in the fire-hose cabinet" }
+      ],
+      "sensorMounts": [
+        { "id": "R30-SM1", "x": 2.8, "y": 31.2, "note": "vestibule ceiling, watching the airlock pair" }
+      ]
+    },
+    "R06": {
+      "itemAnchors": [
+        { "id": "R06-IA1", "x": 2.5, "y": 35, "note": "behind rack row A-1" },
+        { "id": "R06-IA2", "x": 7, "y": 38.5, "note": "under the raised floor, centre aisle" },
+        { "id": "R06-IA3", "x": 11.5, "y": 42, "note": "in the cable tray along the south wall" }
+      ],
+      "lightSources": [
+        { "id": "R06-L1", "x": 5, "y": 40, "kind": "monitor", "range": 3, "intensity": 0.3, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R15": {
+      "itemAnchors": [
+        { "id": "R15-IA1", "x": 16, "y": 35, "note": "behind the chiller unit" },
+        { "id": "R15-IA2", "x": 21, "y": 42, "note": "inside the pump housing" },
+        { "id": "R15-IA3", "x": 27, "y": 41, "note": "in the coolant drum rack" }
+      ],
+      "lightSources": [
+        { "id": "R15-L1", "x": 18, "y": 38, "kind": "highbay", "range": 5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R15-L2", "x": 27, "y": 40, "kind": "emergency", "range": 3, "intensity": 0.3, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "R41": {
+      "itemAnchors": [
+        { "id": "R41-IA1", "x": 29, "y": 32, "note": "behind annex rack A-9" },
+        { "id": "R41-IA2", "x": 41, "y": 32, "note": "bottom shelf of the KVM cart" }
+      ],
+      "lightSources": [
+        { "id": "R41-L1", "x": 31, "y": 32, "kind": "monitor", "range": 3, "intensity": 0.35, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "R41-L2", "x": 39, "y": 32, "kind": "highbay", "range": 5, "intensity": 0.45, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R41-SM1", "x": 41, "y": 31.5, "note": "east end of the machine row, over the vent mouth" }
+      ]
+    },
+    "R33": {
+      "itemAnchors": [
+        { "id": "R33-IA1", "x": 44, "y": 38.5, "note": "under the vehicle lift" },
+        { "id": "R33-IA2", "x": 44.5, "y": 42, "note": "in the oil-drum rack" }
+      ],
+      "lightSources": [
+        { "id": "R33-L1", "x": 43.5, "y": 40, "kind": "emergency", "range": 3, "intensity": 0.3, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R33-SM1", "x": 45, "y": 42.5, "note": "garage south corner, over the vent grate" }
+      ]
+    },
+    "R34": {
+      "itemAnchors": [
+        { "id": "R34-IA1", "x": 49, "y": 35, "note": "behind the coat lockers" }
+      ],
+      "lightSources": [
+        { "id": "R34-L1", "x": 55, "y": 35, "kind": "lamp", "range": 3.5, "intensity": 0.4, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "R34-SM1", "x": 48.5, "y": 35, "note": "antechamber interior, facing the secure-store door" }
+      ],
+      "sabotageFixtureMounts": [
+        { "id": "R34-SB1", "x": 59, "y": 35, "kind": "sensor-relay" }
+      ]
+    },
+    "R08": {
+      "itemAnchors": [
+        { "id": "R08-IA1", "x": 49, "y": 38.5, "note": "in numbered deposit bin 12" },
+        { "id": "R08-IA2", "x": 54, "y": 40.5, "note": "under the packing table" },
+        { "id": "R08-IA3", "x": 60, "y": 42.5, "note": "behind the shelving in the far corner" }
+      ],
+      "lightSources": [
+        { "id": "R08-L1", "x": 56, "y": 40, "kind": "lamp", "range": 3.5, "intensity": 0.35, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
+    "C-N1": {
+      "lightSources": [
+        { "id": "C-N1-L1", "x": 8, "y": 15.5, "kind": "highbay", "range": 4.5, "intensity": 0.55, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "C-N1-L2", "x": 20, "y": 15.5, "kind": "highbay", "range": 4.5, "intensity": 0.55, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-N1-SM1", "x": 6, "y": 15.5, "note": "west end of the north corridor, near reception" },
+        { "id": "C-N1-SM2", "x": 24, "y": 15.5, "note": "east end, covering the C-J1 junction" }
+      ]
+    },
+    "C-J1": {
+      "lightSources": [
+        { "id": "C-J1-L1", "x": 27.5, "y": 13.5, "kind": "highbay", "range": 4, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-J1-SM1", "x": 27.5, "y": 15, "note": "junction stub, sweeping toward the core anteroom" }
+      ]
+    },
+    "C-N2": {
+      "lightSources": [
+        { "id": "C-N2-L1", "x": 33, "y": 11.5, "kind": "highbay", "range": 4.5, "intensity": 0.55, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "C-N2-L2", "x": 42, "y": 11.5, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-N2-SM1", "x": 30.5, "y": 11.5, "note": "west end, covering the C-J1 junction" },
+        { "id": "C-N2-SM2", "x": 41, "y": 11.5, "note": "mid-corridor, over the vent grate" }
+      ]
+    },
+    "C-J3": {
+      "lightSources": [
+        { "id": "C-J3-L1", "x": 47.5, "y": 12, "kind": "highbay", "range": 4, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-J3-SM1", "x": 47.5, "y": 9.5, "note": "north end, outside the east anteroom" }
+      ]
+    },
+    "C-N3": {
+      "lightSources": [
+        { "id": "C-N3-L1", "x": 54, "y": 15.5, "kind": "highbay", "range": 4.5, "intensity": 0.55, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-N3-SM1", "x": 57, "y": 15.5, "note": "east end, covering the C-E junction" }
+      ]
+    },
+    "C-E": {
+      "lightSources": [
+        { "id": "C-E-L1", "x": 60.5, "y": 18, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "C-E-L2", "x": 60.5, "y": 28, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-E-SM1", "x": 60.5, "y": 16, "note": "north junction with C-N3" },
+        { "id": "C-E-SM2", "x": 60.5, "y": 31.5, "note": "south junction toward C-S3" }
+      ]
+    },
+    "C-S3": {
+      "lightSources": [
+        { "id": "C-S3-L1", "x": 50, "y": 31.5, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "C-S3-L2", "x": 58, "y": 31.5, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-S3-SM1", "x": 48.5, "y": 31.5, "note": "west end, outside the vault antechamber" }
+      ]
+    },
+    "C-J4": {
+      "lightSources": [
+        { "id": "C-J4-L1", "x": 45.5, "y": 33.5, "kind": "highbay", "range": 4, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-J4-SM1", "x": 45.5, "y": 31.5, "note": "junction stub between C-S3 and C-S2" }
+      ]
+    },
+    "C-S2": {
+      "lightSources": [
+        { "id": "C-S2-L1", "x": 31, "y": 35.5, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "C-S2-L2", "x": 40, "y": 35.5, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-S2-SM1", "x": 35, "y": 35.5, "note": "mid-corridor along the annex row" }
+      ]
+    },
+    "C-J2": {
+      "lightSources": [
+        { "id": "C-J2-L1", "x": 25.5, "y": 33.5, "kind": "highbay", "range": 4, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-J2-SM1", "x": 25.5, "y": 31.5, "note": "junction with C-S1" }
+      ]
+    },
+    "C-S1": {
+      "lightSources": [
+        { "id": "C-S1-L1", "x": 8, "y": 31.5, "kind": "highbay", "range": 4.5, "intensity": 0.55, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "C-S1-L2", "x": 18, "y": 31.5, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-S1-SM1", "x": 5.5, "y": 31.5, "note": "west end, covering the fire-vestibule approach" },
+        { "id": "C-S1-SM2", "x": 20, "y": 31.5, "note": "east end, near the C-J2 junction" }
+      ]
+    },
+    "C-W": {
+      "lightSources": [
+        { "id": "C-W-L1", "x": 15.5, "y": 20, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 },
+        { "id": "C-W-L2", "x": 15.5, "y": 26, "kind": "highbay", "range": 4.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ],
+      "sensorMounts": [
+        { "id": "C-W-SM1", "x": 15.5, "y": 18.5, "note": "north end, junction with C-N1" }
+      ]
+    }
+  }
+}
