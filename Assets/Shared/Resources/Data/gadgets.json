@@ -162,6 +162,7 @@
     { "id": "map-fragment", "displayName": "Map fragment", "spawnWeight": 1.2, "effect": "labels every room role + badge door in one wing", "placementRule": "revealed wing biased away from spawn wing (Phase 12)" },
     { "id": "maintenance-schematic", "displayName": "Maintenance schematic", "spawnWeight": 0.3, "effect": "labels every room role, door type, and sabotage fixture facility-wide", "placementRule": "never spawns inside a room it would reveal as a vault; strongest item in the pool" },
     { "id": "signal-sniffer", "displayName": "Signal sniffer", "spawnWeight": 0.8, "effect": "pins the nearest two Warden-placed sensors to the blueprint", "note": "the only found item that reveals deployment rather than architecture" },
+    { "id": "fiber-scope", "displayName": "Fiber-optic scope", "spawnWeight": 0.9, "effect": "slide under any closed door (badge-gated included) to view the room behind it for a few seconds", "note": "sees, never opens — the escalation of the baseline Peek verb, which only works at authored apertures" },
     { "id": "radio-spoofer", "displayName": "Radio spoofer", "spawnWeight": 0.15, "charges": 1,
       "constraints": {
         "targetMustBeKnownGuardId": true,

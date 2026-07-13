@@ -79,6 +79,7 @@ Nothing here makes the Infiltrator better in a fight, because the Infiltrator is
 - Crouch / walk / sprint, each with a visible noise-radius indicator — sprinting is loud and pings sound-based sensors.
 - Vents, crawlspaces, and maintenance corridors act as shortcut tiles that bypass patrolled routes entirely.
 - A light-level meter reflects whether you're standing in a light pool or in shadow — shadow is the default stealth state at night, so light (a lamp, an open door, a guard's torch beam) is the hazard, not the reverse.
+- **Peeking.** Every exterior entrance authors a **peek aperture** — a dock-door gap, a sidelight window, a grille — and holding Peek at one shows a narrow view of the room behind the door without opening anything. Slow, silent, stationary: the counter to a guard posted just inside an entrance is patience, not a coin-flip. Most interior doors have no aperture — that's what the Fiber-optic scope is for (see Found Items).
 
 ### Weapons & Gadgets
 Non-lethal only, by design — an Infiltrator who can fight their way out flattens the asymmetry the whole game is built on. On top of the Standard Kit above, the loadout for a round is 3 gadgets, chosen before the setup phase ends:
@@ -109,6 +110,7 @@ Example pool (not exhaustive — meant to be large enough that no two rounds fee
 - **Map fragment** — a torn page of the facility's engineering copy. Permanently labels every room in **one wing** on your blueprint, and marks which of its doors are badge-gated. Common; you'll usually find one, and it usually covers a wing you weren't going to search anyway.
 - **Maintenance schematic** — the whole thing: the facility's own current, marked-up copy of the blueprint. Permanently labels **every room** — the three Data Vaults, the Power Room, the Surveillance/Ops Room — plus every door type and every sabotage fixture. Rare, and the single strongest item in the pool: it collapses the Infiltrator's central problem from *find the objective* to *reach it*. Deliberately no help at all with guards, cameras, or sensors, so knowing where the vault is only sharpens the question of how to get in.
 - **Signal sniffer** — permanently pins the nearest two Warden-placed sensors to your blueprint. Where the map items reveal architecture, this is the only one that reveals *deployment*.
+- **Fiber-optic scope** — slides under **any** closed door — badge-gated included — and shows the room behind it for a few seconds. It sees; it never opens. Turns every door in the building into a peekable one, where the built-in Peek verb only works at authored apertures.
 - **Radio spoofer** — one transmission on the guard channel, as Control. The rarest thing in the pool and the only tool in the game that lies to a person rather than to a machine. See Impersonating Control, under Warden.
 - **Body-drag glove** — lets a downed guard be dragged out of sightlines instead of left where they fell.
 - **Spoofed ID chip** — a longer-duration Ghost Pass, at the cost of a full slot instead of a cooldown.
@@ -407,6 +409,11 @@ Both come from the blueprint's authored anchors, never from runtime pathing. Eac
 
 ### Exfil Points
 A subset of the round's open entrances double as exfil points, generally with different exposure levels (a fast, camera-heavy route vs. a slow, quiet one). Which entrances open, and which of those also exfil, is rolled per round — so scouting matters even on a blueprint you've played a dozen times.
+
+### The Grounds
+The building sits inside a fenced yard — loading yard, front approach, maintenance yard, service alley, and whatever courtyards the blueprint cuts into itself. The grounds are authored per blueprint like everything else: prop cover (vehicles, pallet stacks, transformer pads, dumpsters) supports the exterior scout — walking the perimeter to read which entrances rolled open tonight, then peeking through their apertures before stepping inside.
+
+No guards patrol outside and the Warden has no exterior sensors in the prototype — the grounds are the Infiltrator's half of the night, and crossing the threshold is the moment the round truly starts. A handful of **exterior item anchors** are authored into the yards for the found-item pool to occasionally use; nothing mission-critical ever spawns outside, so an exterior find is a reward for the scouting you were doing anyway. (Exterior cameras or an outdoor guard sweep at high alert are possible later escalations — deliberately out of scope for v1.)
 
 ### Lighting
 Every room dressing carries its own authored light sources (security lamps, monitor glow, overnight office lighting, exterior floodlights) against a dark baseline. Because the walls never move, a blueprint's light pools and shadow routes are stable enough to learn — but a room that was a dim archive last round can be a floodlit vault this one, so the *lighting* of a given room is rolled with its role, not fixed to its walls.
