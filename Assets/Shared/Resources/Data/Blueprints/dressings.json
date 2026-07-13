@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "description": "Room dressing library for Blueprint 01 (Phase 3 hand-picked). Role dressings (vault/power/ops) are applied by the scene loader to the winning rooms at runtime; byRoomDefaults is the per-room filler fallback.",
+  "dressings": {
+    "vault": {
+      "displayName": "Vault",
+      "floorTint": [0.35, 0.28, 0.10],
+      "propStyle": "racks",
+      "propDensity": 0.10,
+      "lightProfile": "cool-bright"
+    },
+    "power": {
+      "displayName": "Power Plant",
+      "floorTint": [0.32, 0.10, 0.08],
+      "propStyle": "machinery",
+      "propDensity": 0.12,
+      "lightProfile": "warm-dim"
+    },
+    "ops": {
+      "displayName": "Operations",
+      "floorTint": [0.22, 0.12, 0.30],
+      "propStyle": "desks",
+      "propDensity": 0.08,
+      "lightProfile": "monitor-glow"
+    },
+    "hall": {
+      "displayName": "Machine Hall",
+      "floorTint": [0.30, 0.31, 0.33],
+      "propStyle": "racks",
+      "propDensity": 0.08,
+      "lightProfile": "dark"
+    },
+    "office": {
+      "displayName": "Office",
+      "floorTint": [0.36, 0.33, 0.28],
+      "propStyle": "desks",
+      "propDensity": 0.10,
+      "lightProfile": "warm-dim"
+    },
+    "storage": {
+      "displayName": "Storage",
+      "floorTint": [0.30, 0.26, 0.20],
+      "propStyle": "crates",
+      "propDensity": 0.12,
+      "lightProfile": "dark"
+    },
+    "plant": {
+      "displayName": "Plant Room",
+      "floorTint": [0.26, 0.28, 0.26],
+      "propStyle": "machinery",
+      "propDensity": 0.10,
+      "lightProfile": "warm-dim"
+    },
+    "utility": {
+      "displayName": "Utility Space",
+      "floorTint": [0.28, 0.28, 0.28],
+      "propStyle": "none",
+      "propDensity": 0.0,
+      "lightProfile": "dark"
+    }
+  },
+  "roleDressings": {
+    "vault": "vault",
+    "power": "power",
+    "ops": "ops"
+  },
+  "byRoomDefaults": {
+    "R01": "storage",
+    "R02": "office",
+    "R03": "office",
+    "R04": "storage",
+    "R05": "office",
+    "R06": "hall",
+    "R07": "hall",
+    "R08": "storage",
+    "R09": "plant",
+    "R10": "hall",
+    "R11": "storage",
+    "R12": "utility",
+    "R13": "hall",
+    "R14": "office",
+    "R15": "plant",
+    "R16": "storage",
+    "R17": "office",
+    "R19": "office",
+    "R22": "utility",
+    "R23": "storage",
+    "R24": "storage",
+    "R26": "utility",
+    "R27": "office",
+    "R28": "office",
+    "R29": "plant",
+    "R30": "utility",
+    "R31": "storage",
+    "R33": "utility",
+    "R34": "utility",
+    "R41": "storage"
+  }
+}

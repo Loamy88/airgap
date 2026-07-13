@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1, "blueprint": "bp01", "label": "phase3-fixed",
+  "vaults": ["R04","R06","R13"], "power": "R09", "ops": "R10",
+  "openEntrances": ["E1","E4","E5","E6"], "exfil": ["E1","E4"],
+  "doorTypes": {
+    "badgeGated": ["D04","D30","D20","D44","D17","D18","D19","D39","D37"],
+    "locked": ["D06","D25","D13","D33","D16","D38"]
+  },
+  "guards": [
+    {"id":"G-01","duty":"patrol","patrol":"P1"},
+    {"id":"G-02","duty":"post","post":"GP4"},
+    {"id":"G-03","duty":"patrol","patrol":"P6"},
+    {"id":"G-04","duty":"post","post":"GP10"},
+    {"id":"G-05","duty":"patrol","patrol":"P4"}
+  ],
+  "dressingOverrides": {}
+}
