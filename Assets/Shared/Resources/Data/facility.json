@@ -103,7 +103,7 @@
   },
 
   "sensors": {
-    "types": ["camera", "motion", "pressure-plate", "tripwire", "microphone", "heat-scanner", "drone-station", "trap"],
+    "types": ["camera", "motion", "pressure-plate", "tripwire", "microphone", "heat-scanner", "drone-station", "trap", "motion-floodlight"],
     "deterministicRule": "machines never roll — authored coverage, exact edges, learnable by the Infiltrator",
     "falseAlarms": {
       "backgroundRatePerSensorPerMinute": 0.08,

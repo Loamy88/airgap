@@ -76,7 +76,7 @@ This phase produces **no randomness and no generation code.** It produces one ha
 
 ### Part A: Schemas
 - [ ] **Blueprint schema:** a JSON floorplan format — rooms, corridors, doorways, vent/crawlspace runs, exterior entrance positions, **and the grounds**: fence line with gates, yard zones, exterior prop anchors, and exterior item anchors (the yards are authored space, not void — see The Grounds in README.md). Every room is a **slot** with a stable ID and an `eligibleRoles` list. Author the `eligibleRoles` field now even though nothing reads it until Phase 12 — it's the whole hinge of the design and it costs nothing to write down early.
-- [ ] **Anchor schema per room:** named, fixed points for `itemAnchor`, `guardPost` (position + facing), `lightSource`, `sensorMount`, `sabotageFixtureMount`, and `peekAperture` (position + facing + type; **every exterior entrance authors one** — the Peek verb that consumes them lands in Phase 10, but the data exists from day one). Nothing in the game is ever placed at a runtime-computed position.
+- [ ] **Anchor schema per room:** named, fixed points for `itemAnchor`, `guardPost` (position + facing), `lightSource`, `sensorMount`, `sabotageFixtureMount`, and `peekAperture` (position + facing + type; **every exterior entrance authors one**, plus a handful of interior service doors — the Peek verb that consumes them lands in Phase 10, but the data exists from day one). **Aperture rule:** an aperture may only look into a room whose every eligible role is filler/office — candidate rooms' own doors stay blind so the Fiber-optic scope keeps its job. Nothing in the game is ever placed at a runtime-computed position.
 - [ ] **Patrol loop schema:** each blueprint carries a set of complete, closed waypoint loops with stable IDs.
 - [ ] **Room role + dressing schema:** what a role is (vault / power / ops / office / filler-*), and what a dressing supplies (a prefab, its own light anchors, its own item anchors).
 - [ ] **Door schema:** per doorway — type (unlocked / locked / badge-gated), `forceable` (derived: true for everything except badge-gated), a hit count to force, and a persistent `forced` flag that survives the rest of the round. Authored here so Phase 5's attribution log and Phase 12's door typing both have a place to write.
@@ -89,7 +89,7 @@ This phase produces **no randomness and no generation code.** It produces one ha
 - [ ] **Room dressing library:** the prefabs for each role. Start with one dressing per role; alternates are a Phase 12 concern.
 
 ### Part C: Tooling & validation
-- [ ] **Blueprint authoring validator** (`-batchmode`, run per blueprint at author time, never per round): every room reachable, every entrance reaches every vault-eligible slot, every patrol loop closed and walkable, every doorway connects exactly two rooms, no anchor outside its room's bounds. A blueprint that fails is a level-design bug, caught before it ships.
+- [ ] **Blueprint authoring validator** (`-batchmode`, run per blueprint at author time, never per round): every room reachable, every entrance reaches every vault-eligible slot, every patrol loop closed and walkable, every doorway connects exactly two rooms, no anchor outside its room's bounds, every exterior entrance carries a `peekAperture`, and no `peekAperture` looks into a role-eligible slot. A blueprint that fails is a level-design bug, caught before it ships.
 - [ ] **Blueprint → scene loader:** build a Unity scene from blueprint JSON + a role assignment. This is the seam the whole project hangs on: Phase 12's generator produces a role assignment, and *nothing downstream can tell* whether it came from a generator or from Part B's hand-picked one.
 - [ ] **Editor visualization:** gizmos for anchors, patrol loops, and role eligibility, so a human can read a blueprint's design intent at a glance.
 - [ ] **Feel playtest (human):** walk Blueprint 01 end to end with the Phase 1 controller. Are the corridors the right length? Do the vents shortcut anything worth shortcutting? Does the lighting from Phase 2 read? Fix the drawing, not the code.
@@ -168,6 +168,7 @@ Swap the rule-based generator from Phase 7 for the real system, behind the same 
 
 ## Phase 9 — Sensor Network & False Alarms
 - [ ] Motion sensors, pressure plates/tripwires, badge readers — each pushes into the Facility Deployment map's sensor-dot layer from Phase 6.
+- [ ] **Exterior security (thin by design — see The Grounds, README.md):** the authored dock camera as a real Camera Bank feed; the maintenance-yard motion floodlight (deterministic trigger zone → its Light2D snaps on + one soft, delayed ping — no precise alert); gravel aprons as noise terrain (footsteps on gravel emit high-loudness events onto Phase 2's bus, hearable by guards inside). Gravel needs no sensor code and can greybox as early as Phase 3's grounds.
 
 ### The LUMEN alert channel
 A second, separate event bus from the sensor layer, and the split is the whole point: **sensors carry a position and no meaning; LUMEN alerts carry a meaning and no position.** Never let a LUMEN alert acquire a map coordinate — the moment one does, the system is dead.
