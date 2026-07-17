@@ -95,7 +95,13 @@ namespace AIRGAP.Infiltrator
             if (_stepTimer < _stance.CurrentStepInterval) return;
             _stepTimer = 0f;
             string type = _stance.Current == AIRGAP.Infiltrator.Stance.Sprint ? "sprint-footstep" : "footstep";
-            SoundBus.Emit(new SoundEvent(type, _stance.CurrentLoudness, _body.position, "infiltrator"));
+            float loudness = _stance.CurrentLoudness;
+            if (GravelZone.Contains(_body.position))
+            {
+                loudness = Mathf.Max(loudness, _config.GravelLoudness);
+                type = "gravel-footstep";
+            }
+            SoundBus.Emit(new SoundEvent(type, loudness, _body.position, "infiltrator"));
         }
 
         private void UpdateFlashlight()

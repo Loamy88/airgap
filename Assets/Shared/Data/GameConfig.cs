@@ -10,6 +10,7 @@ namespace AIRGAP.Shared.Data
         public float CrouchLoudness, WalkLoudness, SprintLoudness, TraversalLoudness;
         public float CrouchStepInterval, WalkStepInterval, SprintStepInterval;
         public float NoiseRingScale;
+        public float GravelLoudness;
     }
 
     public class LightingConfig
@@ -77,7 +78,8 @@ namespace AIRGAP.Shared.Data
                     CrouchStepInterval = F(facility, "infiltrator.footstepIntervalSeconds.crouch"),
                     WalkStepInterval = F(facility, "infiltrator.footstepIntervalSeconds.walk"),
                     SprintStepInterval = F(facility, "infiltrator.footstepIntervalSeconds.sprint"),
-                    NoiseRingScale = F(facility, "infiltrator.noiseRingScale")
+                    NoiseRingScale = F(facility, "infiltrator.noiseRingScale"),
+                    GravelLoudness = F(facility, "infiltrator.gravelLoudness")
                 },
                 Lighting = new LightingConfig
                 {

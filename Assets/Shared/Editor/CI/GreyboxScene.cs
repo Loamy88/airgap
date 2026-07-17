@@ -32,6 +32,7 @@ namespace AIRGAP.CI
 
         public static void Create()
         {
+            bool ok = false;
             try
             {
                 EnsureLayers();
@@ -51,13 +52,15 @@ namespace AIRGAP.CI
                 AssetDatabase.SaveAssets();
 
                 Debug.Log($"[AIRGAP.CI] GreyboxScene OK — {ScenePath} written");
-                if (Application.isBatchMode) EditorApplication.Exit(0);
+                ok = true;
             }
             catch (System.Exception e)
             {
                 Debug.LogError($"[AIRGAP.CI] GreyboxScene FAIL: {e}");
-                if (Application.isBatchMode) EditorApplication.Exit(1);
             }
+            // Exit only after try/catch — exiting from inside try skips cleanup and
+            // persists half-applied editor state (see the ValidatePhase1 incident).
+            if (Application.isBatchMode) EditorApplication.Exit(ok ? 0 : 1);
         }
 
         // ---- rooms ---------------------------------------------------------

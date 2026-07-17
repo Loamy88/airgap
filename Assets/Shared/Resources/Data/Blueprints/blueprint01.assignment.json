@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1, "blueprint": "bp01", "label": "phase3-fixed",
+  "description": "Hand-picked Phase 3 role assignment for Blueprint 01 — the one static facility every phase develops against until Phase 12's generator replaces this file's role. Vaults R04/R06/R13, power R09, ops R10; badge doors on every winner's doorway.",
   "vaults": ["R04","R06","R13"], "power": "R09", "ops": "R10",
   "openEntrances": ["E1","E4","E5","E6"], "exfil": ["E1","E4"],
   "doorTypes": {

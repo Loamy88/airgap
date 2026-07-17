@@ -26,6 +26,7 @@
     "traversal": { "speed": 1.2, "noiseLoudness": 0.15 },
     "footstepIntervalSeconds": { "crouch": 0.55, "walk": 0.4, "sprint": 0.28 },
     "noiseRingScale": 8.0,
+    "gravelLoudness": 0.7,
     "noiseRadiusDebugColor": "green",
     "lightLevels": ["shadow", "dim", "lit"],
     "stanceNote": "Noise values feed the probabilistic hearing model in guards.json; radii are debug visualization only — hearing has no hard radius."

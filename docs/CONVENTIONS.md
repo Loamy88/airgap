@@ -20,7 +20,7 @@ Rules:
 
 ## Code layout
 
-- One public type per file; file name matches the type.
+- One public type per file; file name matches the type. **Exception:** a JSON data-contract module may bundle its schema classes in one file named for the contract (`BlueprintData.cs` holds the blueprint/assignment/dressing POCOs; `BlueprintRaster.cs` carries its `RasterCell` enum) — schema classes are read together, edited together, and versioned together.
 - MonoBehaviours are thin: input polling, rendering, Unity lifecycle only. Game rules live in plain C# classes that a `-batchmode` test can instantiate without a scene.
 - State machines (guard alertness, consciousness, power room) are explicit enum + transition-table types, not `bool` soup — the DEVELOPMENT.md validators assert on transitions.
 - Determinism where the design demands it: `EvaluateOrder`, sensor triggers, and badge checks take no `Random` and no wall-clock — randomness only enters via the round seed (Phase 12) and the hearing roll (Phase 2), each behind an injectable RNG.
@@ -55,6 +55,8 @@ Unity -batchmode -nographics -projectPath . -executeMethod AIRGAP.CI.<Class>.<Me
   - `AIRGAP.CI.GreyboxScene.Create` — (re)generate the Phase 1/2 grey-box test scene (`Assets/Scenes/Greybox.unity`)
   - `AIRGAP.CI.ValidatePhase1.Run` — scripted movement sequence: stances, speeds, footsteps, vent traversal
   - `AIRGAP.CI.ValidatePhase2.Run` — light sampling/occlusion, flashlight self-light, vision categories, hearing curve
+  - `AIRGAP.CI.ValidatePhase3.Run` — blueprint authoring validator: schema sanity, connectivity, patrols, anchors, peek/vent rules, assignment coherence
+  - `AIRGAP.CI.BlueprintScene.Create` — build `Assets/Scenes/Blueprint01.unity` from blueprint JSON + role assignment (the Phase 12 seam)
 - Headless simulation pattern: gameplay components expose `EnsureInitialized()` + `Tick(dt)`; validators set `Physics2D.simulationMode = Script`, drive ticks, and step `Physics2D.Simulate` themselves. World state queries are poll-based (no trigger callbacks) so play mode and batchmode behave identically.
 - Machine-local paths (editor path, project path) live in `.env` (gitignored); see `.env` on this machine.
 

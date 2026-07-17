@@ -19,6 +19,7 @@ namespace AIRGAP.CI
 
         public static void CreateBootstrapScene()
         {
+            bool ok = false;
             try
             {
                 ConfigurePlayerSettings();
@@ -29,13 +30,14 @@ namespace AIRGAP.CI
                 AssetDatabase.SaveAssets();
 
                 Debug.Log($"[AIRGAP.CI] SceneBootstrap OK — {ScenePath} + {PrefabPath} written, build list updated");
-                if (Application.isBatchMode) EditorApplication.Exit(0);
+                ok = true;
             }
             catch (System.Exception e)
             {
                 Debug.LogError($"[AIRGAP.CI] SceneBootstrap FAIL: {e}");
-                if (Application.isBatchMode) EditorApplication.Exit(1);
             }
+            // Exit only after try/catch — see the ValidatePhase1 simulationMode incident.
+            if (Application.isBatchMode) EditorApplication.Exit(ok ? 0 : 1);
         }
 
         private static void ConfigurePlayerSettings()

@@ -30,6 +30,14 @@
         { "id": "R02-SM1", "x": 2, "y": 9.5, "note": "front-door interior, above the visitor sign-in" }
       ]
     },
+    "R18": {
+      "itemAnchors": [
+        { "id": "R18-IA1", "x": 16, "y": 12, "note": "paper-store shelf" }
+      ],
+      "lightSources": [
+        { "id": "R18-L1", "x": 13, "y": 11, "kind": "desk", "range": 3.5, "intensity": 0.5, "coneDeg": 0, "facingDeg": 0 }
+      ]
+    },
     "R03": {
       "itemAnchors": [
         { "id": "R03-IA1", "x": 12, "y": 2, "note": "bottom drawer of the corner desk" },
