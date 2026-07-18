@@ -64,6 +64,11 @@ namespace AIRGAP.Infiltrator
         public void Tick(float deltaTime)
         {
             EnsureInitialized();
+            if (AIRGAP.Facility.Guards.CaptureSystem.IsCaptured)
+            {
+                _body.linearVelocity = Vector2.zero;
+                return;
+            }
             _input.Poll();
 
             InTraversal = TraversalZone.Contains(_body.position);

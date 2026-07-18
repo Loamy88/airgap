@@ -579,31 +579,41 @@ namespace AIRGAP.CI
                         throw new InvalidOperationException($"guard {duty.Id}: unknown post '{duty.Post}'");
                     position = World(post.X, post.Y);
                     facing = Quaternion.Euler(0f, 0f, -post.FacingDeg) * Vector2.right;
+                    GameObject guardGo = BuildGuard(duty.Id, position, facing);
+                    // Post room role feeds the high-security-post order predicate.
+                    BlueprintSpace room = _bp.SpaceAt(new Vector2(post.X, post.Y));
+                    guardGo.GetComponent<GuardAgent>().SetPost(position, facing, RoleOf(room?.Id));
                 }
                 else
                 {
                     BlueprintPatrol patrol = _bp.Patrols.Find(p => p.Id == duty.Patrol);
                     if (patrol == null || patrol.Waypoints == null || patrol.Waypoints.Count < 2)
                         throw new InvalidOperationException($"guard {duty.Id}: unknown/short patrol '{duty.Patrol}'");
-                    // Patrol MOVEMENT is Phase 4 — static placement at the first waypoint.
                     float[] w0 = patrol.Waypoints[0];
                     float[] w1 = patrol.Waypoints[1];
                     position = World(w0[0], w0[1]);
                     facing = ((Vector2)(World(w1[0], w1[1]) - position)).normalized;
+                    GameObject guardGo = BuildGuard(duty.Id, position, facing);
+                    var waypoints = new Vector2[patrol.Waypoints.Count];
+                    for (int i = 0; i < waypoints.Length; i++)
+                        waypoints[i] = World(patrol.Waypoints[i][0], patrol.Waypoints[i][1]);
+                    guardGo.GetComponent<GuardAgent>().SetPatrol(waypoints, patrol.Closed);
                 }
-                BuildGuard(duty.Id, position, facing);
                 count++;
             }
             return count;
         }
 
-        private static void BuildGuard(string guardId, Vector3 position, Vector2 facing)
+        private static GameObject BuildGuard(string guardId, Vector3 position, Vector2 facing)
         {
             var guard = new GameObject($"Guard_{guardId}") { layer = ActorsLayer };
             guard.transform.position = position;
             guard.transform.right = facing;
-            var collider = guard.AddComponent<BoxCollider2D>();
-            collider.size = new Vector2(0.9f, 0.9f);
+            var body = guard.AddComponent<Rigidbody2D>();
+            body.gravityScale = 0f;
+            body.freezeRotation = true;
+            var collider = guard.AddComponent<CircleCollider2D>();
+            collider.radius = 0.4f;
             guard.AddComponent<GuardMarker>().SetGuardId(guardId);
             Visual(guard.transform, "Body", new Vector2(0.9f, 0.9f), new Color(0.3f, 0.5f, 0.95f), 5);
 
@@ -617,6 +627,8 @@ namespace AIRGAP.CI
             coneLine.sortingOrder = 9;
             guard.AddComponent<GuardVision>().SetConeRenderer(coneLine);
             guard.AddComponent<GuardHearing>();
+            guard.AddComponent<GuardAgent>(); // duty wired by the caller; guards start Relaxed
+            return guard;
         }
 
         private static GameObject BuildPlayer()
@@ -713,6 +725,7 @@ namespace AIRGAP.CI
             light.pointLightOuterRadius = range;
             light.color = color;
             light.intensity = intensity;
+            light.shadowIntensity = 0.9f; // respect ShadowCaster2D walls — no beams through walls
             if (coneDegrees > 0f)
             {
                 light.pointLightInnerAngle = coneDegrees * 0.7f;
@@ -735,6 +748,9 @@ namespace AIRGAP.CI
             {
                 var box = go.AddComponent<BoxCollider2D>();
                 box.size = size;
+                // Solid greybox = visual occluder: block Light2D like the walls
+                // already block AirgapLight's gameplay linecasts.
+                Shadow2D.AddRectCaster(go, size.x, size.y);
             }
             return go;
         }

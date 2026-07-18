@@ -230,6 +230,7 @@ namespace AIRGAP.CI
             light.pointLightOuterRadius = range;
             light.color = color;
             light.intensity = intensity;
+            light.shadowIntensity = 0.9f; // respect ShadowCaster2D walls — no beams through walls
             if (coneDegrees > 0f)
             {
                 light.pointLightInnerAngle = coneDegrees * 0.7f;
@@ -254,6 +255,9 @@ namespace AIRGAP.CI
             {
                 var box = go.AddComponent<BoxCollider2D>();
                 box.size = size;
+                // Solid greybox = visual occluder: block Light2D like the walls
+                // already block AirgapLight's gameplay linecasts.
+                Shadow2D.AddRectCaster(go, size.x, size.y);
             }
             return go;
         }

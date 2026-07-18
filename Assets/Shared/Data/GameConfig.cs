@@ -29,6 +29,39 @@ namespace AIRGAP.Shared.Data
         public float HearingReferenceDistance;
         public float HearingProbabilityFloor;
         public float RelaxedMultiplier, StandardMultiplier, HeightenedMultiplier;
+        public float PatrolSpeed, InvestigateSpeed, ChaseSpeed;
+        public float CloseRangeCaptureDistance;
+        public LadderConfig Ladder;
+        public DutyConfig Duty;
+        public OrdersConfig Orders;
+        public float MemoryBufferSeconds;
+    }
+
+    public class LadderConfig
+    {
+        public float NoneVision, SilhouetteVision, PartialVision, ClearVision; // suspicion/sec by category
+        public float NoticedSoundBump;
+        public float DecayPerSecond, DecayDelaySeconds;
+        public float SuspiciousThreshold, SearchingThreshold, AlarmedThreshold;
+        public bool AlarmedRequiresSight;
+        public float RelaxedRate, StandardRate, HeightenedRate;
+    }
+
+    public class DutyConfig
+    {
+        public float WaypointTolerance;
+        public float PatrolPauseSeconds;
+        public float InvestigateSeconds;
+        public float SearchGiveUpSeconds;
+        public float ChaseLoseSightSeconds;
+        public float MeleeReachTiles;
+    }
+
+    public class OrdersConfig
+    {
+        public float TransientTtlSeconds;
+        public float DeploymentLatencySeconds;
+        public float DebounceSeconds;
     }
 
     public class FlashlightConfig
@@ -100,7 +133,44 @@ namespace AIRGAP.Shared.Data
                     HearingProbabilityFloor = F(guards, "hearing.falloff.minProbabilityFloor"),
                     RelaxedMultiplier = F(guards, "hearing.alertnessMultipliers.relaxed"),
                     StandardMultiplier = F(guards, "hearing.alertnessMultipliers.standard"),
-                    HeightenedMultiplier = F(guards, "hearing.alertnessMultipliers.heightened")
+                    HeightenedMultiplier = F(guards, "hearing.alertnessMultipliers.heightened"),
+                    PatrolSpeed = F(guards, "movement.patrolSpeed"),
+                    InvestigateSpeed = F(guards, "movement.investigateSpeed"),
+                    ChaseSpeed = F(guards, "movement.chaseSpeed"),
+                    CloseRangeCaptureDistance = F(guards, "vision.closeRangeCaptureDistance"),
+                    MemoryBufferSeconds = F(guards, "memory.bufferSeconds"),
+                    Ladder = new LadderConfig
+                    {
+                        NoneVision = F(guards, "alertnessLadder.suspicion.visionPerSecond.none"),
+                        SilhouetteVision = F(guards, "alertnessLadder.suspicion.visionPerSecond.silhouette"),
+                        PartialVision = F(guards, "alertnessLadder.suspicion.visionPerSecond.partial"),
+                        ClearVision = F(guards, "alertnessLadder.suspicion.visionPerSecond.clear"),
+                        NoticedSoundBump = F(guards, "alertnessLadder.suspicion.noticedSoundBump"),
+                        DecayPerSecond = F(guards, "alertnessLadder.suspicion.decayPerSecond"),
+                        DecayDelaySeconds = F(guards, "alertnessLadder.suspicion.decayDelaySeconds"),
+                        SuspiciousThreshold = F(guards, "alertnessLadder.suspicion.suspiciousThreshold"),
+                        SearchingThreshold = F(guards, "alertnessLadder.suspicion.searchingThreshold"),
+                        AlarmedThreshold = F(guards, "alertnessLadder.suspicion.alarmedThreshold"),
+                        AlarmedRequiresSight = guards.SelectToken("alertnessLadder.suspicion.alarmedRequiresSight")?.Value<bool>() ?? true,
+                        RelaxedRate = F(guards, "alertnessLadder.suspicion.baselineRateMultipliers.relaxed"),
+                        StandardRate = F(guards, "alertnessLadder.suspicion.baselineRateMultipliers.standard"),
+                        HeightenedRate = F(guards, "alertnessLadder.suspicion.baselineRateMultipliers.heightened")
+                    },
+                    Duty = new DutyConfig
+                    {
+                        WaypointTolerance = F(guards, "duty.waypointToleranceTiles"),
+                        PatrolPauseSeconds = F(guards, "duty.patrolPauseSeconds"),
+                        InvestigateSeconds = F(guards, "duty.investigateSeconds"),
+                        SearchGiveUpSeconds = F(guards, "duty.searchGiveUpSeconds"),
+                        ChaseLoseSightSeconds = F(guards, "duty.chaseLoseSightSeconds"),
+                        MeleeReachTiles = F(guards, "duty.meleeReachTiles")
+                    },
+                    Orders = new OrdersConfig
+                    {
+                        TransientTtlSeconds = F(guards, "orders.transientDefaultTtlSeconds"),
+                        DeploymentLatencySeconds = F(guards, "orders.deploymentExecutionLatencySeconds"),
+                        DebounceSeconds = F(guards, "orders.debounceSeconds")
+                    }
                 },
                 Flashlight = LoadFlashlight(gadgets)
             };

@@ -15,7 +15,9 @@ namespace AIRGAP.Shared.Greybox
         private InfiltratorController _player;
         private GuardVision[] _vision;
         private GuardHearing[] _hearing;
+        private GuardAgent[] _agents;
         private GUIStyle _style;
+        private GUIStyle _bannerStyle;
 
         private void OnGUI()
         {
@@ -24,11 +26,21 @@ namespace AIRGAP.Shared.Greybox
                 _player = FindFirstObjectByType<InfiltratorController>();
                 _vision = FindObjectsByType<GuardVision>(FindObjectsSortMode.None);
                 _hearing = FindObjectsByType<GuardHearing>(FindObjectsSortMode.None);
+                _agents = FindObjectsByType<GuardAgent>(FindObjectsSortMode.None);
                 if (_player == null) return;
             }
             _style ??= new GUIStyle(GUI.skin.label) { fontSize = 13, richText = true };
 
-            GUILayout.BeginArea(new Rect(12, 12, 430, 300), GUI.skin.box);
+            if (CaptureSystem.IsCaptured)
+            {
+                _bannerStyle ??= new GUIStyle(GUI.skin.box)
+                    { fontSize = 26, richText = true, alignment = TextAnchor.MiddleCenter };
+                GUI.Box(new Rect(Screen.width / 2f - 260, Screen.height / 2f - 50, 520, 100),
+                    $"<color=#ff5544><b>CAPTURED</b></color>\nby {CaptureSystem.CapturedByGuardId} — {CaptureSystem.Reason}",
+                    _bannerStyle);
+            }
+
+            GUILayout.BeginArea(new Rect(12, 12, 430, 430), GUI.skin.box);
             GUILayout.Label("<b>AIRGAP grey-box</b>  (WASD move, Shift sprint, Ctrl/C crouch, F flashlight, T test noise)", _style);
             GUILayout.Label($"Stance: <b>{_player.Stance.Current}</b>   loudness {_player.Stance.CurrentLoudness:F2}   speed {_player.Stance.CurrentSpeed:F1}", _style);
             GUILayout.Label($"In vent: <b>{_player.InTraversal}</b>   flashlight: <b>{(_player.FlashlightOn ? "ON" : "off")}</b>", _style);
@@ -41,6 +53,19 @@ namespace AIRGAP.Shared.Greybox
             {
                 if (guard == null) continue;
                 GUILayout.Label($"{guard.GuardId} sees: <b>{guard.Current}</b>  (target light {guard.TargetLightCategory}, eff. range {guard.EffectiveRange:F1})", _style);
+            }
+
+            foreach (GuardAgent agent in _agents ?? System.Array.Empty<GuardAgent>())
+            {
+                if (agent == null) continue;
+                string color = agent.Ladder.State switch
+                {
+                    GuardAlertState.Alarmed => "#ff5544",
+                    GuardAlertState.Searching => "#ff9944",
+                    GuardAlertState.Suspicious => "#ffdd44",
+                    _ => "#99bb99"
+                };
+                GUILayout.Label($"{agent.GuardId} [{agent.Duty}] <color={color}><b>{agent.Ladder.State}</b></color> s={agent.Ladder.Suspicion:F2} ({agent.Baseline})", _style);
             }
 
             foreach (GuardHearing guard in _hearing)

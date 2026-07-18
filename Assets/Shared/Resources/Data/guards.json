@@ -46,7 +46,29 @@
   "alertnessLadder": {
     "states": ["unaware", "suspicious", "searching", "alarmed"],
     "reportKeyUpDelaySeconds": { "min": 0.5, "max": 1.5 },
-    "alarmedRule": "Alarmed guards accept no orders and auto-engage/capture on reaching the Infiltrator."
+    "alarmedRule": "Alarmed guards accept no orders and auto-engage/capture on reaching the Infiltrator.",
+    "suspicion": {
+      "description": "Suspicion accumulates per second from what the guard perceives, decays in calm. Crossing thresholds climbs the ladder; dropping below (after the decay delay) descends one rung at a time. Alarmed additionally requires current sight of the target (a noise alone never alarms).",
+      "visionPerSecond": { "none": 0.0, "silhouette": 0.35, "partial": 0.9, "clear": 2.5 },
+      "noticedSoundBump": 0.8,
+      "decayPerSecond": 0.25,
+      "decayDelaySeconds": 2.0,
+      "suspiciousThreshold": 0.6,
+      "searchingThreshold": 1.8,
+      "alarmedThreshold": 3.0,
+      "alarmedRequiresSight": true,
+      "baselineRateMultipliers": { "relaxed": 0.7, "standard": 1.0, "heightened": 1.5 }
+    }
+  },
+
+  "duty": {
+    "description": "Duty execution numbers: patrol waypoint following, investigate/search behavior, chase persistence. All Phase 17 tuning surfaces.",
+    "waypointToleranceTiles": 0.4,
+    "patrolPauseSeconds": 1.2,
+    "investigateSeconds": 6.0,
+    "searchGiveUpSeconds": 10.0,
+    "chaseLoseSightSeconds": 4.0,
+    "meleeReachTiles": 1.1
   },
 
   "memory": {
