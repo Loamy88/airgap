@@ -35,6 +35,9 @@ namespace AIRGAP.Shared.Data
         public DutyConfig Duty;
         public OrdersConfig Orders;
         public float MemoryBufferSeconds;
+        public float DownDurationSeconds;
+        public string BadgeIdPrefix;
+        public float BadgePlausibilityRadius;
     }
 
     public class LadderConfig
@@ -170,7 +173,10 @@ namespace AIRGAP.Shared.Data
                         TransientTtlSeconds = F(guards, "orders.transientDefaultTtlSeconds"),
                         DeploymentLatencySeconds = F(guards, "orders.deploymentExecutionLatencySeconds"),
                         DebounceSeconds = F(guards, "orders.debounceSeconds")
-                    }
+                    },
+                    DownDurationSeconds = F(guards, "consciousness.downDurationSeconds"),
+                    BadgeIdPrefix = (string)guards.SelectToken("badge.badgeIdPrefix") ?? "B-",
+                    BadgePlausibilityRadius = F(facility, "doors.badgePlausibilityRadiusTiles")
                 },
                 Flashlight = LoadFlashlight(gadgets)
             };

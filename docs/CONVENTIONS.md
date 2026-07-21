@@ -58,6 +58,7 @@ Unity -batchmode -nographics -projectPath . -executeMethod AIRGAP.CI.<Class>.<Me
   - `AIRGAP.CI.ValidatePhase3.Run` — blueprint authoring validator: schema sanity, connectivity, patrols, anchors, peek/vent rules, assignment coherence
   - `AIRGAP.CI.BlueprintScene.Create` — build `Assets/Scenes/Blueprint01.unity` from blueprint JSON + role assignment (the Phase 12 seam)
   - `AIRGAP.CI.ValidatePhase4.Run` — guard behavior + order intake: predicate matrix, gate, source blindness, TTL, patrol/chase/capture simulation
+  - `AIRGAP.CI.ValidatePhase5.Run` — consciousness, status checks, badge loot/flag paths, flagged rejection, plausibility ping, door attribution
 - Headless simulation pattern: gameplay components expose `EnsureInitialized()` + `Tick(dt)`; validators set `Physics2D.simulationMode = Script`, drive ticks, and step `Physics2D.Simulate` themselves. World state queries are poll-based (no trigger callbacks) so play mode and batchmode behave identically.
 - Machine-local paths (editor path, project path) live in `.env` (gitignored); see `.env` on this machine.
 

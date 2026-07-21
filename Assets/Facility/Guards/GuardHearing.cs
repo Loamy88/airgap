@@ -33,6 +33,9 @@ namespace AIRGAP.Facility.Guards
 
         [SerializeField] private GuardAlertness alertness = GuardAlertness.Standard;
 
+        /// <summary>An unconscious guard hears nothing (Phase 5); the agent sets this.</summary>
+        public bool Suppressed { get; set; }
+
         private GuardConfig _config;
         private GuardMarker _marker;
         private System.Random _random;
@@ -65,7 +68,11 @@ namespace AIRGAP.Facility.Guards
             SoundBus.Emitted -= OnSound;
         }
 
-        private void OnSound(SoundEvent sound) => EvaluateAndRecord(sound);
+        private void OnSound(SoundEvent sound)
+        {
+            if (Suppressed) return;
+            EvaluateAndRecord(sound);
+        }
 
         public HearingResult EvaluateAndRecord(SoundEvent sound)
         {

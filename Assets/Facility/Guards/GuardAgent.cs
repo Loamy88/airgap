@@ -60,12 +60,15 @@ namespace AIRGAP.Facility.Guards
         public AlertnessLadder Ladder { get; private set; }
         public GuardMemory Memory { get; private set; }
         public OrderSlots Orders { get; private set; }
+        public GuardConsciousness Consciousness { get; private set; }
         public DutyMode Duty { get; private set; } = DutyMode.Post;
         public GuardAlertness Baseline => _baseline;
         public bool ChannelOpen { get; set; } // Phase 7 wires reports; tests set it directly
 
         private Vector2 _focusPoint;      // investigate/search/chase target
         private GuardAlertness? _preTransientBaseline; // restored when a transient SetAlertness expires
+        private SpriteRenderer _bodyRenderer;
+        private Color _bodyColor;
         private float _searchTimer;
         private float _loseSightTimer;
         private float _sightMemoryPush;
@@ -89,6 +92,11 @@ namespace AIRGAP.Facility.Guards
             Ladder = new AlertnessLadder(_config.Ladder);
             Memory = new GuardMemory(_config.MemoryBufferSeconds);
             Orders = new OrderSlots();
+            Consciousness = new GuardConsciousness();
+            Consciousness.Woke += OnWake;
+            _bodyRenderer = GetComponentInChildren<SpriteRenderer>();
+            if (_bodyRenderer != null) _bodyColor = _bodyRenderer.color;
+            BadgeSystem.Register(GuardId, _config.BadgeIdPrefix);
             Ladder.StateChanged += (previous, current) =>
                 Debug.Log($"[AIRGAP] LADDER guard={GuardId} {previous} -> {current} (suspicion={Ladder.Suspicion:F2})");
             if (_hearing != null) _hearing.Heard += OnHeard;
@@ -154,6 +162,15 @@ namespace AIRGAP.Facility.Guards
             }
 
             Memory.Tick(deltaTime);
+            Consciousness.Tick(deltaTime);
+            if (Consciousness.IsDown)
+            {
+                // Down = inert. No perception, no movement, no orders — and no
+                // event to the Warden: indistinguishable, without a status check,
+                // from a guard standing still.
+                _body.linearVelocity = Vector2.zero;
+                return;
+            }
             _sinceAcceptedOrder += deltaTime;
             TickPendingStanding(deltaTime);
             if (Orders.Tick(deltaTime))
@@ -191,7 +208,7 @@ namespace AIRGAP.Facility.Guards
 
         private void OnHeard(GuardHearing.HearingResult result)
         {
-            if (!result.Noticed || !_initialized) return;
+            if (!result.Noticed || !_initialized || Consciousness.IsDown) return;
             Memory.Push(MemoryEventType.Sound, result.Sound.Position, result.Sound.Type,
                 Mathf.Clamp01(result.Probability));
             Ladder.OnNoticedSound(Baseline);
@@ -382,6 +399,57 @@ namespace AIRGAP.Facility.Guards
             Duty = _hasPatrol && Orders.StandingOrder?.Type == OrderType.Patrol ? DutyMode.Patrol : DutyMode.Post;
             _searchTimer = 0f;
             _loseSightTimer = 0f;
+        }
+
+        // ---- consciousness (Phase 5) -----------------------------------------
+
+        /// <summary>
+        /// Silent takedown (Phase 10's pry bar calls this; validators call it now).
+        /// Enqueues NO report — a takedown is not, by itself, information.
+        /// </summary>
+        public void TakeDown(float? seconds = null)
+        {
+            EnsureInitialized();
+            Consciousness.GoDown(seconds ?? _config.DownDurationSeconds);
+            _body.linearVelocity = Vector2.zero;
+            if (_hearing != null) _hearing.Suppressed = true;
+            if (_bodyRenderer != null) _bodyRenderer.color = _bodyColor * 0.35f;
+            Debug.Log($"[AIRGAP] DOWN guard={GuardId} for {Consciousness.DownRemaining:F0}s (no disclosure)");
+        }
+
+        private void OnWake()
+        {
+            if (_hearing != null) _hearing.Suppressed = false;
+            if (_bodyRenderer != null) _bodyRenderer.color = _bodyColor;
+
+            // Wake at Searching, focused on where it happened — they know they
+            // were attacked, they just don't know by whom or from where.
+            Ladder.ForceState(GuardAlertState.Searching, _config.Ladder.SearchingThreshold);
+            _focusPoint = _body.position;
+            Duty = DutyMode.Search;
+            _searchTimer = 0f;
+
+            // The unconditional incident report — fires whether or not the Warden
+            // ever ran a status check — and the second Badge Flag confirmation path.
+            ReportPipeline.Enqueue(new ReportRequest
+            {
+                GuardId = GuardId,
+                Tag = "recovering-from-attack",
+                Position = _body.position
+            });
+            BadgeSystem.ConfirmUnresponsive(GuardId);
+        }
+
+        /// <summary>
+        /// The badge plausibility comparison set: a post guard is expected at
+        /// their post; a patrol guard anywhere along their authored loop.
+        /// </summary>
+        public IEnumerable<Vector2> ExpectedDutyPoints()
+        {
+            if (_hasPost) { yield return _postPosition; yield break; }
+            if (_patrolWaypoints != null)
+                foreach (Vector2 waypoint in _patrolWaypoints) yield return waypoint;
+            else yield return _body != null ? _body.position : (Vector2)transform.position;
         }
 
         // ---- orders ----------------------------------------------------------

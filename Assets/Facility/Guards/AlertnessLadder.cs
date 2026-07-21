@@ -96,10 +96,11 @@ namespace AIRGAP.Facility.Guards
             SetState(next);
         }
 
-        /// <summary>Agent-driven transitions (chase lost, Disregard order drops a rung).</summary>
+        /// <summary>Agent-driven transitions (chase lost, wake-up, Disregard drops a rung).</summary>
         public void ForceState(GuardAlertState state, float suspicion)
         {
             Suspicion = suspicion;
+            _sinceStimulus = 0f; // a forced state is a fresh stimulus — decay waits its full delay
             SetState(state);
         }
 

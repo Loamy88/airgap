@@ -57,7 +57,9 @@
     "defaultForceHitCount": 5,
     "forcedFlagPersists": true,
     "badgeGatedConstraint": "Vault, Power, and Ops slots always sit behind a badge reader",
-    "attributionLog": ["openClosedState", "lastOpenerBadgeId"]
+    "attributionLog": ["openClosedState", "lastOpenerBadgeId"],
+    "badgePlausibilityRadiusTiles": 14,
+    "plausibilityNote": "A badge used further than this from its owner's expected location (post, or nearest patrol waypoint) raises a passive suspicion ping — softer than a Badge Flag, fires whether or not the badge is flagged yet."
   },
 
   "objectives": {

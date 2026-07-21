@@ -106,6 +106,9 @@ namespace AIRGAP.CI
             var debugGo = new GameObject("BlueprintDebug");
             debugGo.AddComponent<BlueprintDebug>().SetBlueprint(BlueprintBaseName);
 
+            var runtimeGo = new GameObject("FacilityRuntime");
+            runtimeGo.AddComponent<FacilityRuntime>().SetBlueprint(BlueprintBaseName);
+
             if (!EditorSceneManager.SaveScene(scene, ScenePath))
                 throw new Exception($"failed to save {ScenePath}");
             AssetDatabase.SaveAssets();

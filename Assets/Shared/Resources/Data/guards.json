@@ -87,6 +87,7 @@
 
   "badge": {
     "carriesBadge": true,
+    "badgeIdPrefix": "B-",
     "lootableWhenDown": true,
     "flagTrigger": "Unresponsive confirmed (status check or wake-up report) AND badge missing -> badge ID flagged facility-wide."
   },

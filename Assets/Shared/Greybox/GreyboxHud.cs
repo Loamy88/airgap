@@ -58,6 +58,11 @@ namespace AIRGAP.Shared.Greybox
             foreach (GuardAgent agent in _agents ?? System.Array.Empty<GuardAgent>())
             {
                 if (agent == null) continue;
+                if (agent.Consciousness != null && agent.Consciousness.IsDown)
+                {
+                    GUILayout.Label($"{agent.GuardId} <color=#777788><b>DOWN</b> {agent.Consciousness.DownRemaining:F0}s</color>", _style);
+                    continue;
+                }
                 string color = agent.Ladder.State switch
                 {
                     GuardAlertState.Alarmed => "#ff5544",

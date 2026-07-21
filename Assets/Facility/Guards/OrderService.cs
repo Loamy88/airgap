@@ -39,6 +39,15 @@ namespace AIRGAP.Facility.Guards
 
             var result = new OrderResult { GuardId = guardId, Order = order, Source = source };
 
+            if (agent.Consciousness.IsDown)
+            {
+                // Radio silence — a Down guard can't answer. The Warden's channel
+                // for LEARNING that is the status check or the wake-up report.
+                Debug.Log($"[AIRGAP] ORDER source={source} guard={guardId} {order.Type} — no response");
+                OrderProcessed?.Invoke(result);
+                return result;
+            }
+
             // Executability gate: un-offerable orders never reach the plausibility
             // check — they're simply absent from the UI.
             if (!agent.OfferableOrders().Contains(order.Type))
